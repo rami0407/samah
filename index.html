@@ -240,7 +240,18 @@
         </section>
 
         <!-- VIEW 3: RESULTS / CERTIFICATE SCREEN -->
-        <section id="view-results" class="hidden glass-card rounded-3xl p-5 sm:p-8 transition-all duration-300 my-auto">
+        <section id="view-results" class="hidden glass-card rounded-3xl p-5 sm:p-8 transition-all duration-300 my-auto relative overflow-hidden">
+            <!-- Suspenseful Countdown Reveal Overlay -->
+            <div id="winner-suspense-overlay" class="hidden flex flex-col items-center justify-center py-14 text-center">
+                <div class="text-6xl sm:text-7xl mb-4 animate-bounce">🥁</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2">لحظة الحسم... جاري إعلان الفائز!</h2>
+                <p class="text-sm sm:text-base text-slate-600 font-bold mb-6">استعدوا لمعرفة أبطال موضوع الحجم في مدرسة عارة الشاملة</p>
+                <div id="suspense-countdown-num" class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-black text-5xl flex items-center justify-center shadow-2xl border-4 border-white animate-pulse">
+                    3
+                </div>
+            </div>
+
+            <div id="result-main-content">
             <div class="relative rounded-3xl bg-gradient-to-br from-slate-900 via-teal-950 to-indigo-950 text-white p-6 sm:p-8 border-4 border-amber-400 shadow-2xl mb-6 overflow-hidden">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/15 pb-4 mb-5">
                     <div class="flex items-center gap-3">
@@ -299,6 +310,7 @@
                     <span>🏠</span>
                     <span>العودة لصفحة الألعاب</span>
                 </button>
+            </div>
             </div>
         </section>
 
@@ -768,18 +780,29 @@
                     gain.connect(audioCtx.destination);
                     osc.start(now);
                     osc.stop(now + 0.27);
+                } else if (type === 'tick') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
                 } else if (type === 'win') {
-                    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+                    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
-                        osc.type = 'sine';
+                        osc.type = 'triangle';
                         osc.frequency.setValueAtTime(freq, now + idx * 0.1);
-                        gain.gain.setValueAtTime(0.18, now + idx * 0.1);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.38);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.45);
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
                         osc.start(now + idx * 0.1);
-                        osc.stop(now + idx * 0.1 + 0.4);
+                        osc.stop(now + idx * 0.1 + 0.46);
                     });
                 }
             } catch (e) {}
@@ -1264,8 +1287,44 @@
             }
         });
 
+        function launchFireworks() {
+            const duration = 2200;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.65 } });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.65 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            })();
+        }
+
         function showResults() {
             showView(viewResults);
+            const suspenseOverlay = document.getElementById('winner-suspense-overlay');
+            const mainContent = document.getElementById('result-main-content');
+            const countEl = document.getElementById('suspense-countdown-num');
+
+            mainContent.classList.add('hidden');
+            suspenseOverlay.classList.remove('hidden');
+
+            let count = 3;
+            countEl.textContent = count;
+            playTone('tick');
+
+            const timer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countEl.textContent = count;
+                    playTone('tick');
+                } else {
+                    clearInterval(timer);
+                    suspenseOverlay.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    revealFinalWinnerContent();
+                }
+            }, 750);
+        }
+
+        function revealFinalWinnerContent() {
             const game = GAMES_DATA.find(g => g.id === appState.selectedGameId);
             document.getElementById('result-game-subtitle').textContent = `الصف السابع • ${game.title}`;
 
@@ -1281,25 +1340,34 @@
                 groupPodium.classList.remove('hidden');
 
                 const sorted = [...appState.groups].sort((a, b) => b.score - a.score);
-                const winner = sorted[0];
-                rankBadge.textContent = "🏆 تحدي المجموعات";
+                const topScore = sorted[0].score;
+                const winners = sorted.filter(g => g.score === topScore);
+
+                rankBadge.textContent = "👑 منصة التتويج";
                 emojiEl.textContent = "🏆";
-                titleEl.textContent = `الفائز بالمركز الأول: ${winner.name}!`;
-                msgEl.textContent = `مبارك لجميع المجموعات المشاركة في لعبة "${game.title}"`;
+                if (winners.length > 1) {
+                    titleEl.textContent = `تعادل مثير في الصدارة: ${winners.map(w => w.name).join(' و ')}!`;
+                } else {
+                    titleEl.textContent = `البطل المتوّج: ${winners[0].name}! 👑`;
+                }
+                msgEl.textContent = `مبارك لجميع المجموعات المشاركة في لعبة "${game.title}" — مدرسة عارة الشاملة`;
 
                 groupPodium.innerHTML = '';
                 sorted.forEach((grp, idx) => {
+                    const isFirst = idx === 0;
+                    const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`;
                     const card = document.createElement('div');
-                    card.className = `rounded-2xl p-4 border-2 ${idx === 0 ? 'bg-amber-400/20 border-amber-400' : 'bg-white/10 border-white/15'}`;
+                    card.className = `rounded-2xl p-4 border-2 transition-transform ${isFirst ? 'bg-gradient-to-b from-amber-400/30 to-amber-500/10 border-amber-400 scale-105 shadow-xl' : 'bg-white/10 border-white/15'}`;
                     card.innerHTML = `
-                        <div class="text-xs text-slate-300 font-bold">المركز #${idx + 1}</div>
+                        <div class="text-2xl mb-1">${medal}</div>
+                        <div class="text-xs text-slate-300 font-bold">المركز ${idx + 1}</div>
                         <div class="text-lg font-black text-white mt-0.5">${grp.name}</div>
                         <div class="text-2xl font-black text-amber-300 mt-1">${grp.score} نقطة</div>
                     `;
                     groupPodium.appendChild(card);
                 });
                 playTone('win');
-                confetti({ particleCount: 120, spread: 85, origin: { y: 0.6 } });
+                launchFireworks();
             } else {
                 soloStats.classList.remove('hidden');
                 groupPodium.classList.add('hidden');
@@ -1314,16 +1382,17 @@
                 document.getElementById('result-points').textContent = appState.score;
 
                 if (pct >= 85) {
-                    rankBadge.textContent = "🏆 عالِم علوم متميّز";
+                    rankBadge.textContent = "👑 عالِم علوم متميّز";
                     emojiEl.textContent = "🏆";
-                    msgEl.textContent = "أداء مذهل! أتقنت موضوع الحجم بامتياز.";
+                    msgEl.textContent = "أداء مذهل! أتقنت موضوع الحجم بامتياز واستحققت التتويج.";
                     playTone('win');
-                    confetti({ particleCount: 110, spread: 80, origin: { y: 0.6 } });
+                    launchFireworks();
                 } else if (pct >= 65) {
                     rankBadge.textContent = "🔬 مستكشف بارع";
                     emojiEl.textContent = "🌟";
                     msgEl.textContent = "عمل رائع جداً! استمر في التقدم.";
                     playTone('win');
+                    confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
                 } else {
                     rankBadge.textContent = "📚 مثابر وطموح";
                     emojiEl.textContent = "💪";
