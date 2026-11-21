@@ -744,12 +744,12 @@
         const DEFAULT_GAMES = [
             {
                 id: "champions-race",
-                arena: "car-race",
-                title: "سباق الأبطال (سباق السيارات)",
-                icon: "🏎️",
+                arena: "classic",
+                title: "سباق الأبطال",
+                icon: "🏆",
                 color: "from-emerald-600 to-teal-700",
-                badge: "سباق سيارات",
-                description: "تنافس بسيارتك على المضمار! كل إجابة صحيحة تدفع سيارتك نحو خط النهاية.",
+                badge: "النمط الكلاسيكي",
+                description: "التحدي الكلاسيكي الشامل لأسئلة الحجم مع الشرح الفوري والمحاكاة التفاعلية.",
                 questions: [
                     { type: "mcq", topic: "مفهوم الحجم", question: "ما المقصود بمصطلح الحجم؟", options: ["كمية المادة الموجودة في الجسم", "الحيز الذي يشغله الجسم من الفراغ", "مقدار الكتلة من المادة", "مقدار الحرارة التي يمتلكها الجسم"], correctIndex: 1, explanation: "الحجم هو مقدار الحيز الذي يشغله الجسم في الفراغ." },
                     { type: "mcq", topic: "وحدات القياس", question: "أي من الوحدات تستخدم لقياس حجم جسم صلب صغير؟", options: ["لتر", "كغم", "سم³", "طن"], correctIndex: 2, explanation: "يُقاس حجم الأجسام الصلبة الصغيرة بوحدة السنتيمتر المكعب (سم³)." },
@@ -891,12 +891,12 @@
             },
             {
                 id: "box-packing",
-                arena: "dino-run",
-                title: "الهروب من الديناصور",
-                icon: "🦖",
+                arena: "cyber-dash",
+                title: "السباق الإلكتروني السريع",
+                icon: "⚡",
                 color: "from-teal-600 to-emerald-800",
-                badge: "مطاردة الغابة",
-                description: "اهرب من الديناصور بسرعة بحل مسائل تعبئة الصناديق بالمكعبات والسعات!",
+                badge: "تحدي السرعة",
+                description: "اختر البوابة الصحيحة في المسار الرقمي لحل مسائل تعبئة الصناديق والسعات!",
                 questions: [
                     { type: "fill", topic: "تعبئة صندوق", question: "كم مكعباً حجمه 2 سم³ يمكن وضعه في صندوق حجمه 20 سم³؟ (اكتب الرقم فقط)", answer: "10", explanation: "20 ÷ 2 = 10 مكعبات." },
                     { type: "mcq", topic: "تعبئة صندوق", question: "صندوق حجمه 36 سم³، كم مكعباً حجمه 3 سم³ يسع هذا الصندوق؟", options: ["12 مكعباً", "12 سم³", "108 مكعبات", "9 مكعبات"], correctIndex: 0, explanation: "36 ÷ 3 = 12 مكعباً." },
@@ -980,7 +980,7 @@
         // ============================================================
         // STORAGE (FIREBASE SYNC + LOCALSTORAGE FALLBACK)
         // ============================================================
-        const STORAGE_KEY = "ara_school_volume_games_v4";
+        const STORAGE_KEY = "ara_school_volume_games_v5";
 
         function loadGamesData() {
             try {
@@ -1009,11 +1009,16 @@
             db.ref('games').on('value', (snap) => {
                 const val = snap.val();
                 if (Array.isArray(val) && val.length === DEFAULT_GAMES.length) {
+                    // Ensure champions-race stays classic and box-packing stays cyber-dash
+                    if (val[0] && val[0].id === 'champions-race' && val[0].arena !== 'classic') {
+                        val[0].arena = 'classic';
+                        val[0].title = DEFAULT_GAMES[0].title;
+                        val[0].badge = DEFAULT_GAMES[0].badge;
+                    }
                     GAMES_DATA = val;
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(val)); } catch (e) {}
                     if (typeof renderLandingGrid === 'function') renderLandingGrid();
                 } else if (!val) {
-                    // Seed default games on first run
                     db.ref('games').set(GAMES_DATA).catch(() => {});
                 }
             });
@@ -1277,7 +1282,13 @@
 
             document.getElementById('quiz-game-title-badge').textContent = `${game.icon} ${game.title}`;
             showView(viewQuiz);
-            initArcade(game.arena || 'car-race');
+            if ((game.arena || 'classic') === 'classic') {
+                stopArcade();
+                document.getElementById('game-arena-box').classList.add('hidden');
+            } else {
+                document.getElementById('game-arena-box').classList.remove('hidden');
+                initArcade(game.arena);
+            }
             renderGroupScoreboard();
             renderQuestion();
         }
@@ -1500,8 +1511,10 @@
             const btnFormula = document.getElementById('btn-lifeline-formula');
             const used5050 = appState.mode === 'group' ? appState.groups[appState.activeGroupIndex].used5050 : appState.soloUsed5050;
             const usedFormula = appState.mode === 'group' ? appState.groups[appState.activeGroupIndex].usedFormula : appState.soloUsedFormula;
+            const game = GAMES_DATA.find(g => g.id === appState.selectedGameId);
+            const isClassic = (game?.arena || 'classic') === 'classic';
 
-            btn5050.disabled = used5050 || arcadeState.targets.length < 3 || appState.answered;
+            btn5050.disabled = used5050 || appState.answered || (isClassic ? q.type !== 'mcq' : arcadeState.targets.length < 3);
             btnFormula.disabled = usedFormula || appState.answered;
         }
 
@@ -1716,9 +1729,16 @@
 
             canvas.onpointermove = (e) => {
                 const rect = canvas.getBoundingClientRect();
-                arcadeState.pointerX = ((e.clientX - rect.left) / rect.width) * canvas.width;
-                arcadeState.pointerY = ((e.clientY - rect.top) / rect.height) * canvas.height;
+                arcadeState.pointerX = ((e.clientX - rect.left) / rect.width) * 760;
+                arcadeState.pointerY = ((e.clientY - rect.top) / rect.height) * 360;
                 if (arcadeState.arena === 'star-wars') arcadeState.shipX = Math.max(45, Math.min(715, arcadeState.pointerX));
+                arcadeState.hoveredTarget = null;
+                for (const tg of arcadeState.targets) {
+                    if (!tg.hidden && Math.abs(arcadeState.pointerX - tg.x) <= tg.w / 2 + 8 && Math.abs(arcadeState.pointerY - tg.y) <= tg.h / 2 + 8) {
+                        arcadeState.hoveredTarget = tg;
+                        break;
+                    }
+                }
             };
 
             canvas.onpointerdown = (e) => {
@@ -1806,21 +1826,101 @@
 
         function drawChoicePill(ctx, tg, bgColor = "#0f172a", borderColor = "#38bdf8") {
             if (tg.hidden) return;
+            const isHover = arcadeState.hoveredTarget === tg;
             const x = tg.x - tg.w / 2, y = tg.y - tg.h / 2;
-            ctx.fillStyle = bgColor;
-            ctx.strokeStyle = borderColor;
-            ctx.lineWidth = 2.5;
+
+            ctx.save();
+            ctx.shadowColor = isHover ? "#fde047" : borderColor;
+            ctx.shadowBlur = isHover ? 16 : 8;
+            ctx.fillStyle = isHover ? "#1e293b" : bgColor;
+            ctx.strokeStyle = isHover ? "#fde047" : borderColor;
+            ctx.lineWidth = isHover ? 3 : 2;
             ctx.beginPath();
             ctx.roundRect(x, y, tg.w, tg.h, 12);
             ctx.fill();
             ctx.stroke();
+            ctx.restore();
 
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 14px Cairo";
+            ctx.fillStyle = "#f8fafc";
+            ctx.font = "800 14px Cairo";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             const label = tg.text.length > 22 ? tg.text.slice(0, 21) + "…" : tg.text;
             ctx.fillText(label, tg.x, tg.y);
+        }
+
+        function drawVectorShip(ctx, x, y, color = "#22d3ee") {
+            ctx.save();
+            ctx.translate(x, y);
+            // Thruster flame
+            const flame = 8 + Math.sin(arcadeState.t * 0.6) * 4;
+            ctx.fillStyle = "#f59e0b";
+            ctx.beginPath(); ctx.moveTo(-6, 14); ctx.lineTo(0, 14 + flame); ctx.lineTo(6, 14); ctx.closePath(); ctx.fill();
+            // Wings & Hull
+            ctx.fillStyle = "#0f172a";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -22); ctx.lineTo(22, 14); ctx.lineTo(7, 10); ctx.lineTo(-7, 10); ctx.lineTo(-22, 14); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            // Cockpit
+            ctx.fillStyle = "#38bdf8";
+            ctx.beginPath(); ctx.ellipse(0, -3, 4, 8, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function drawVectorAlien(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = "#312e81";
+            ctx.strokeStyle = "#a855f7";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(0, 0, 22, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = "#c084fc";
+            ctx.beginPath(); ctx.arc(0, -5, 9, Math.PI, 0); ctx.fill();
+            ctx.fillStyle = "#f43f5e";
+            [-10, 0, 10].forEach(lx => { ctx.beginPath(); ctx.arc(lx, 2, 2.5, 0, Math.PI * 2); ctx.fill(); });
+            ctx.restore();
+        }
+
+        function drawVectorKeeper(ctx, x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            // Body
+            ctx.fillStyle = "#f59e0b";
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(-14, -12, 28, 30, 8); ctx.fill(); ctx.stroke();
+            // Head
+            ctx.fillStyle = "#fde68a";
+            ctx.beginPath(); ctx.arc(0, -20, 9, 0, Math.PI * 2); ctx.fill();
+            // Gloves
+            ctx.fillStyle = "#10b981";
+            ctx.beginPath(); ctx.arc(-22, -4, 7, 0, Math.PI * 2); ctx.arc(22, -4, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function drawVectorBall(ctx, x, y, r = 15, isBasket = false) {
+            ctx.save();
+            ctx.translate(x, y);
+            const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            if (isBasket) {
+                grad.addColorStop(0, "#fb923c"); grad.addColorStop(1, "#9a3412");
+            } else {
+                grad.addColorStop(0, "#ffffff"); grad.addColorStop(1, "#94a3b8");
+            }
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = isBasket ? "#431407" : "#1e293b";
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+            if (!isBasket) {
+                ctx.fillStyle = "#1e293b";
+                ctx.beginPath(); ctx.arc(0, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.beginPath(); ctx.moveTo(-r, 0); ctx.lineTo(r, 0); ctx.moveTo(0, -r); ctx.lineTo(0, r); ctx.stroke();
+            }
+            ctx.restore();
         }
 
         function drawArcadeFrame(ctx, W, H) {
@@ -1829,58 +1929,67 @@
             ctx.clearRect(0, 0, W, H);
 
             if (arena === 'snake') {
-                ctx.fillStyle = "#062c22";
-                ctx.fillRect(0, 0, W, H);
-                ctx.strokeStyle = "rgba(16, 185, 129, 0.14)";
-                ctx.lineWidth = 1;
+                const bg = ctx.createLinearGradient(0, 0, 0, H);
+                bg.addColorStop(0, "#022c22"); bg.addColorStop(1, "#064e3b");
+                ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+                ctx.strokeStyle = "rgba(52, 211, 153, 0.12)"; ctx.lineWidth = 1;
                 for (let x = 0; x < W; x += 28) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
                 for (let y = 0; y < H; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-                // Snake body
+                // Neon Snake
                 arcadeState.snake.forEach((seg, idx) => {
-                    ctx.fillStyle = idx === 0 ? "#4ade80" : "#16a34a";
-                    ctx.beginPath();
-                    ctx.roundRect(seg.x * 28 + 2, seg.y * 28 + 2, 24, 24, 7);
-                    ctx.fill();
+                    ctx.save();
+                    ctx.shadowColor = "#4ade80";
+                    ctx.shadowBlur = idx === 0 ? 14 : 4;
+                    ctx.fillStyle = idx === 0 ? "#4ade80" : "#10b981";
+                    ctx.beginPath(); ctx.roundRect(seg.x * 28 + 3, seg.y * 28 + 3, 22, 22, 7); ctx.fill();
+                    ctx.restore();
                 });
 
-                // Glowing answer orbs
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.fillStyle = "#dc2626";
-                    ctx.beginPath(); ctx.arc(tg.x, tg.y, 13, 0, Math.PI * 2); ctx.fill();
-                    drawChoicePill(ctx, { ...tg, y: tg.y + 26, h: 28 }, "rgba(15,23,42,0.92)", "#f59e0b");
+                    ctx.save();
+                    ctx.shadowColor = "#f43f5e"; ctx.shadowBlur = 12;
+                    ctx.fillStyle = "#f43f5e";
+                    ctx.beginPath(); ctx.arc(tg.x, tg.y, 10 + Math.sin(t * 0.12) * 1.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                    drawChoicePill(ctx, { ...tg, y: tg.y + 26, h: 28 }, "rgba(15,23,42,0.92)", "#fbbf24");
                 });
             } else if (arena === 'star-wars') {
-                ctx.fillStyle = "#020617";
-                ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = "#e2e8f0";
-                for (let i = 0; i < 45; i++) ctx.fillRect((i * 97) % W, ((i * 53) + t * 2) % H, 2, 2);
+                const bg = ctx.createLinearGradient(0, 0, 0, H);
+                bg.addColorStop(0, "#020617"); bg.addColorStop(1, "#0f172a");
+                ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = "rgba(226, 232, 240, 0.65)";
+                for (let i = 0; i < 55; i++) ctx.fillRect((i * 97) % W, ((i * 53) + t * 1.8) % H, (i % 2) + 1, (i % 2) + 1);
 
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.font = "28px Cairo"; ctx.textAlign = "center";
-                    ctx.fillText("👾", tg.x, tg.y - 30);
+                    drawVectorAlien(ctx, tg.x, tg.y - 34);
                     drawChoicePill(ctx, tg, "#1e1b4b", "#22d3ee");
                 });
 
-                ctx.fillStyle = "#22d3ee";
-                arcadeState.bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 5, 16));
+                ctx.save();
+                ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 10;
+                ctx.fillStyle = "#67e8f9";
+                arcadeState.bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 16));
+                ctx.restore();
 
-                ctx.font = "36px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("🚀", arcadeState.shipX, 322);
+                drawVectorShip(ctx, arcadeState.shipX, 318, "#22d3ee");
             } else if (arena === 'soccer') {
-                ctx.fillStyle = "#15803d";
-                ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = "#166534";
+                const turf = ctx.createLinearGradient(0, 0, 0, H);
+                turf.addColorStop(0, "#064e3b"); turf.addColorStop(1, "#15803d");
+                ctx.fillStyle = turf; ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = "rgba(255,255,255,0.04)";
                 for (let x = 0; x < W; x += 76) ctx.fillRect(x, 0, 38, H);
 
-                ctx.strokeStyle = "#ffffff";
-                ctx.lineWidth = 6;
+                // Stadium Goalposts + Net
+                ctx.fillStyle = "rgba(15,23,42,0.35)";
+                ctx.fillRect(120, 22, 520, 175);
+                ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 1;
+                for (let gx = 140; gx < 640; gx += 22) { ctx.beginPath(); ctx.moveTo(gx, 22); ctx.lineTo(gx, 197); ctx.stroke(); }
+                for (let gy = 42; gy < 197; gy += 22) { ctx.beginPath(); ctx.moveTo(120, gy); ctx.lineTo(640, gy); ctx.stroke(); }
+                ctx.strokeStyle = "#f8fafc"; ctx.lineWidth = 6;
                 ctx.strokeRect(120, 22, 520, 175);
-                ctx.strokeStyle = "rgba(255,255,255,0.2)";
-                ctx.lineWidth = 1;
-                for (let gx = 140; gx < 640; gx += 25) { ctx.beginPath(); ctx.moveTo(gx, 22); ctx.lineTo(gx, 197); ctx.stroke(); }
 
                 arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "rgba(15,23,42,0.88)", "#fde047"));
 
@@ -1888,8 +1997,7 @@
                     arcadeState.keeperX += arcadeState.keeperDir * 3.2;
                     if (arcadeState.keeperX > 570 || arcadeState.keeperX < 190) arcadeState.keeperDir *= -1;
                 }
-                ctx.font = "40px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("🧤", arcadeState.keeperX, 118);
+                drawVectorKeeper(ctx, arcadeState.keeperX, 122);
 
                 const b = arcadeState.ball;
                 if (b.active) {
@@ -1897,87 +2005,102 @@
                     b.scale = Math.max(0.65, b.scale - 0.015);
                     if (Math.hypot(b.x - b.targetX, b.y - b.targetY) < 16) b.active = false;
                 }
-                ctx.font = `${Math.round(36 * b.scale)}px Cairo`;
-                ctx.fillText("⚽", b.x, b.y);
-            } else if (arena === 'car-race') {
-                ctx.fillStyle = "#1e293b";
-                ctx.fillRect(0, 0, W, H);
-                const count = arcadeState.targets.length || 4;
-                const laneH = H / count;
-                const offset = (t * 5) % 60;
-                ctx.strokeStyle = "#fde047"; ctx.lineWidth = 2; ctx.setLineDash([25, 35]);
-                for (let i = 1; i < count; i++) {
-                    ctx.beginPath(); ctx.moveTo(-offset, i * laneH); ctx.lineTo(W, i * laneH); ctx.stroke();
-                }
-                ctx.setLineDash([]);
-
-                arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#0f172a", tg.lane === arcadeState.carLane ? "#fde047" : "#64748b"));
-
-                const carY = arcadeState.carLane * laneH + laneH / 2;
-                ctx.font = "38px Cairo"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText("🏎️", arcadeState.carX, carY);
+                drawVectorBall(ctx, b.x, b.y, 17 * b.scale, false);
             } else if (arena === 'basketball') {
-                ctx.fillStyle = "#451a03"; ctx.fillRect(0, 0, W, H);
-                ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 3; ctx.strokeRect(18, 18, W - 36, H - 36);
+                const court = ctx.createLinearGradient(0, 0, 0, H);
+                court.addColorStop(0, "#1e1b4b"); court.addColorStop(0.55, "#451a03"); court.addColorStop(1, "#78350f");
+                ctx.fillStyle = court; ctx.fillRect(0, 0, W, H);
+                ctx.strokeStyle = "rgba(251,191,36,0.45)"; ctx.lineWidth = 2; ctx.strokeRect(20, 18, W - 40, H - 36);
+
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.font = "26px Cairo"; ctx.textAlign = "center";
-                    ctx.fillText("🗑️", tg.x, tg.y - 34);
-                    drawChoicePill(ctx, tg, "#7c2d12", "#fbbf24");
+                    // Glass Backboard & Rim
+                    ctx.fillStyle = "rgba(255,255,255,0.15)";
+                    ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 2;
+                    ctx.fillRect(tg.x - 28, tg.y - 54, 56, 30);
+                    ctx.strokeRect(tg.x - 28, tg.y - 54, 56, 30);
+                    ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(tg.x - 16, tg.y - 26); ctx.lineTo(tg.x + 16, tg.y - 26); ctx.stroke();
+                    drawChoicePill(ctx, tg, "#451a03", "#fbbf24");
                 });
                 const b = arcadeState.ball;
                 if (b.active) {
                     b.x += b.vx; b.y += b.vy; b.vy += 0.65;
                     if (Math.abs(b.x - b.targetX) < 18 && b.vy > 0) b.active = false;
                 }
-                ctx.font = "36px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("🏀", b.x, b.y);
+                drawVectorBall(ctx, b.x, b.y, 17, true);
             } else if (arena === 'balloon-pop') {
-                ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, W, H);
-                const bIcons = ["🎈", "🟣", "🔵", "🟢"];
+                const sky = ctx.createLinearGradient(0, 0, 0, H);
+                sky.addColorStop(0, "#0f172a"); sky.addColorStop(1, "#1e1b4b");
+                ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+                const bCols = ["#f43f5e", "#8b5cf6", "#06b6d4", "#10b981"];
                 arcadeState.targets.forEach((tg, i) => {
                     if (tg.hidden) return;
                     const fy = tg.y + Math.sin(t * 0.06 + i) * 7;
-                    ctx.font = "32px Cairo"; ctx.textAlign = "center";
-                    ctx.fillText(bIcons[i % 4], tg.x, fy - 32);
-                    drawChoicePill(ctx, { ...tg, y: fy }, "#831843", "#f472b6");
+                    ctx.fillStyle = bCols[i % 4];
+                    ctx.beginPath(); ctx.ellipse(tg.x, fy - 42, 16, 20, 0, 0, Math.PI * 2); ctx.fill();
+                    drawChoicePill(ctx, { ...tg, y: fy }, "#1e1b4b", bCols[i % 4]);
                 });
-                ctx.font = "34px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("🏹", 380, 326);
+                // Crosshair
+                ctx.strokeStyle = "#f472b6"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(arcadeState.pointerX, arcadeState.pointerY, 14, 0, Math.PI * 2); ctx.stroke();
             } else if (arena === 'treasure-ship') {
-                ctx.fillStyle = "#0369a1"; ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = "#0284c7"; ctx.fillRect(0, 140 + Math.sin(t * 0.06) * 5, W, 220);
+                const sea = ctx.createLinearGradient(0, 0, 0, H);
+                sea.addColorStop(0, "#0c4a6e"); sea.addColorStop(1, "#0369a1");
+                ctx.fillStyle = sea; ctx.fillRect(0, 0, W, H);
+                ctx.strokeStyle = "rgba(186,230,253,0.25)"; ctx.lineWidth = 2;
+                for (let wy = 70; wy < H; wy += 45) {
+                    ctx.beginPath();
+                    for (let wx = 0; wx <= W; wx += 30) ctx.lineTo(wx, wy + Math.sin((wx + t * 3) * 0.04) * 4);
+                    ctx.stroke();
+                }
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.font = "28px Cairo"; ctx.textAlign = "center";
-                    ctx.fillText("🏝️💎", tg.x, tg.y - 34);
-                    drawChoicePill(ctx, tg, "#0c4a6e", "#38bdf8");
+                    ctx.fillStyle = "#fde047";
+                    ctx.beginPath(); ctx.arc(tg.x, tg.y - 34, 14, Math.PI, 0); ctx.fill();
+                    drawChoicePill(ctx, tg, "#082f49", "#38bdf8");
                 });
-                ctx.font = "38px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("⛵", 380, 322);
-            } else if (arena === 'dino-run') {
-                ctx.fillStyle = "#064e3b"; ctx.fillRect(0, 0, W, H);
-                arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#065f46", "#34d399"));
-                ctx.font = "38px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("🦖", 110, 320);
-                ctx.fillText("🏃‍♂️", 260, 320);
+                // Vector Ship
+                ctx.fillStyle = "#78350f";
+                ctx.beginPath(); ctx.moveTo(345, 315); ctx.lineTo(415, 315); ctx.lineTo(400, 336); ctx.lineTo(360, 336); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = "#f8fafc";
+                ctx.beginPath(); ctx.moveTo(380, 275); ctx.lineTo(405, 312); ctx.lineTo(380, 312); ctx.closePath(); ctx.fill();
+            } else if (arena === 'cyber-dash') {
+                const bg = ctx.createLinearGradient(0, 0, 0, H);
+                bg.addColorStop(0, "#022c22"); bg.addColorStop(1, "#0f172a");
+                ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+                ctx.strokeStyle = "rgba(16,185,129,0.25)"; ctx.lineWidth = 2;
+                for (let gx = (t * 4) % 40; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 280); ctx.lineTo(gx, H); ctx.stroke(); }
+                arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#064e3b", "#34d399"));
+                // Cyber Runner Pod
+                ctx.fillStyle = "#34d399";
+                ctx.beginPath(); ctx.roundRect(355, 295, 50, 22, 11); ctx.fill();
             } else if (arena === 'bomb-defuse') {
-                ctx.fillStyle = "#18181b"; ctx.fillRect(0, 0, W, H);
-                ctx.font = "44px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("💣", 380, 44);
+                ctx.fillStyle = "#09090b"; ctx.fillRect(0, 0, W, H);
+                // Circuit board grid
+                ctx.strokeStyle = "rgba(239,68,68,0.12)"; ctx.lineWidth = 1;
+                for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+                // Central Core
+                ctx.fillStyle = "#27272a"; ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(320, 18, 120, 44, 10); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#ef4444"; ctx.font = "800 13px Cairo"; ctx.textAlign = "center";
+                ctx.fillText("ACTIVE CORE", 380, 41);
+
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.strokeStyle = tg.color; ctx.lineWidth = 6;
-                    ctx.beginPath(); ctx.moveTo(380, 52); ctx.lineTo(tg.x, tg.y); ctx.stroke();
-                    drawChoicePill(ctx, tg, "#27272a", tg.color);
+                    ctx.strokeStyle = tg.color; ctx.lineWidth = 5;
+                    ctx.beginPath(); ctx.moveTo(380, 62); ctx.bezierCurveTo(380, 110, tg.x, 90, tg.x, tg.y); ctx.stroke();
+                    drawChoicePill(ctx, tg, "#18181b", tg.color);
                 });
             } else {
                 // tower-build
-                ctx.fillStyle = "#1e1b4b"; ctx.fillRect(0, 0, W, H);
+                const bg = ctx.createLinearGradient(0, 0, 0, H);
+                bg.addColorStop(0, "#0f172a"); bg.addColorStop(1, "#1e1b4b");
+                ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
                 arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#312e81", "#fbbf24"));
                 for (let i = 0; i < appState.correctCount; i++) {
                     ctx.fillStyle = i % 2 === 0 ? "#f59e0b" : "#10b981";
-                    ctx.fillRect(320, H - 20 - i * 14, 120, 12);
+                    ctx.fillRect(320, H - 18 - i * 14, 120, 12);
                 }
             }
 
@@ -2035,8 +2158,67 @@
             }
         });
 
+        function renderClassicOptions(q, area) {
+            area.innerHTML = '';
+            if (q.type === 'mcq') {
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-1 sm:grid-cols-2 gap-3.5";
+                const letters = ['أ', 'ب', 'ج', 'د'];
+                (q.options || []).forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = "option-btn w-full text-right p-3.5 sm:p-4 min-h-[52px] rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-300 hover:border-emerald-500 font-extrabold text-sm sm:text-lg text-slate-800 shadow-sm flex items-center gap-3";
+                    btn.innerHTML = `<span class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center font-black text-teal-800 shrink-0">${letters[idx]}</span><span class="flex-1">${opt}</span>`;
+                    btn.addEventListener('click', () => {
+                        if (appState.answered) return;
+                        const isCorrect = idx === q.correctIndex;
+                        grid.querySelectorAll('button').forEach((b, i) => {
+                            b.disabled = true;
+                            if (i === q.correctIndex) b.classList.add('bg-emerald-100', 'border-emerald-600', 'text-emerald-950');
+                            else if (i === idx && !isCorrect) b.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-950', 'shake-anim');
+                            else b.classList.add('opacity-60');
+                        });
+                        finalizeAnswer(isCorrect, opt, q.options[q.correctIndex], q);
+                    });
+                    grid.appendChild(btn);
+                });
+                area.appendChild(grid);
+            } else if (q.type === 'tf') {
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-2 gap-4 max-w-xl mx-auto";
+                [{ val: true, label: "✅ صح" }, { val: false, label: "❌ خطأ" }].forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = "option-btn p-4 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-300 hover:border-emerald-500 font-black text-lg text-slate-800 shadow-sm text-center";
+                    btn.textContent = item.label;
+                    btn.addEventListener('click', () => {
+                        if (appState.answered) return;
+                        const isCorrect = item.val === q.correctBool;
+                        grid.querySelectorAll('button').forEach(b => b.disabled = true);
+                        btn.classList.add(isCorrect ? 'bg-emerald-100' : 'bg-rose-100');
+                        finalizeAnswer(isCorrect, item.label, q.correctBool ? "✅ صح" : "❌ خطأ", q);
+                    });
+                    grid.appendChild(btn);
+                });
+                area.appendChild(grid);
+            } else if (q.type === 'fill') {
+                const box = document.createElement('div');
+                box.className = "max-w-lg mx-auto bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 flex gap-2";
+                box.innerHTML = `<input id="classic-fill-inp" type="text" placeholder="اكتب الإجابة..." class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-300 font-black text-center"><button id="classic-fill-btn" type="button" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-black">تحقق</button>`;
+                area.appendChild(box);
+                box.querySelector('#classic-fill-btn').addEventListener('click', () => {
+                    if (appState.answered) return;
+                    const v = box.querySelector('#classic-fill-inp').value.trim();
+                    if (!v) return;
+                    finalizeAnswer(v.toLowerCase() === String(q.answer).trim().toLowerCase(), v, q.answer, q);
+                });
+            }
+        }
+
         function renderQuestion() {
             const q = appState.activeQuestions[appState.currentIndex];
+            const game = GAMES_DATA.find(g => g.id === appState.selectedGameId);
+            const isClassic = (game?.arena || 'classic') === 'classic';
             appState.answered = false;
 
             const total = appState.activeQuestions.length;
@@ -2049,25 +2231,38 @@
             document.getElementById('quiz-streak').textContent = appState.streak;
             document.getElementById('quiz-progress-bar').style.width = `${(num / total) * 100}%`;
 
-            // Update Hearts
             const wrongCount = appState.history.filter(h => !h.isCorrect).length;
             const heartsLeft = Math.max(0, 3 - (wrongCount % 4));
             document.getElementById('quiz-hearts').textContent = "❤️".repeat(heartsLeft) + "🖤".repeat(3 - heartsLeft);
 
-            // Setup Canvas Targets inside the game world!
-            setupQuestionTargets(q);
-            document.getElementById('quiz-question-text').textContent = q._matchPrompt || q.question;
-            document.getElementById('arena-status-label').textContent = "صوّب نحو الإجابة الصحيحة داخل اللعبة!";
-
-            // Inline Cylinder Simulation toggle if question has q.sim
             const simBtn = document.getElementById('btn-toggle-sim-inline');
             const simBox = document.getElementById('quiz-visual-box');
-            simBox.classList.add('hidden');
-            if (q.sim) {
-                simBtn.classList.remove('hidden');
-                renderQuizVisual(q, simBox);
-            } else {
+            const classicArea = document.getElementById('quiz-interaction-area');
+
+            if (isClassic) {
+                classicArea.classList.remove('hidden');
+                renderClassicOptions(q, classicArea);
+                document.getElementById('quiz-question-text').textContent = q.question;
+                document.getElementById('arena-status-label').textContent = "اختر الإجابة الصحيحة أدناه";
                 simBtn.classList.add('hidden');
+                if (q.sim) {
+                    simBox.classList.remove('hidden');
+                    renderQuizVisual(q, simBox);
+                } else {
+                    simBox.classList.add('hidden');
+                }
+            } else {
+                classicArea.classList.add('hidden');
+                setupQuestionTargets(q);
+                document.getElementById('quiz-question-text').textContent = q._matchPrompt || q.question;
+                document.getElementById('arena-status-label').textContent = "صوّب نحو الإجابة الصحيحة داخل اللعبة!";
+                simBox.classList.add('hidden');
+                if (q.sim) {
+                    simBtn.classList.remove('hidden');
+                    renderQuizVisual(q, simBox);
+                } else {
+                    simBtn.classList.add('hidden');
+                }
             }
 
             document.getElementById('quiz-feedback-box').classList.add('hidden');
@@ -2699,7 +2894,10 @@
         document.getElementById('btn-lifeline-5050').addEventListener('click', () => {
             if (appState.answered) return;
             const q = appState.activeQuestions[appState.currentIndex];
-            if (arcadeState.targets.length < 3) return;
+            const game = GAMES_DATA.find(g => g.id === appState.selectedGameId);
+            const isClassic = (game?.arena || 'classic') === 'classic';
+            if (isClassic && q.type !== 'mcq') return;
+            if (!isClassic && arcadeState.targets.length < 3) return;
 
             if (appState.mode === 'group') {
                 if (appState.groups[appState.activeGroupIndex].used5050) return;
@@ -2709,12 +2907,27 @@
                 appState.soloUsed5050 = true;
             }
 
-            const wrongTargets = arcadeState.targets.filter(t => !t.isCorrect && !t.hidden);
-            for (let i = wrongTargets.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [wrongTargets[i], wrongTargets[j]] = [wrongTargets[j], wrongTargets[i]];
+            if (isClassic) {
+                const buttons = Array.from(document.querySelectorAll('#quiz-interaction-area button'));
+                const wrongIndices = [0, 1, 2, 3].filter(i => i !== q.correctIndex);
+                for (let i = wrongIndices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [wrongIndices[i], wrongIndices[j]] = [wrongIndices[j], wrongIndices[i]];
+                }
+                wrongIndices.slice(0, 2).forEach(idx => {
+                    if (buttons[idx]) {
+                        buttons[idx].disabled = true;
+                        buttons[idx].classList.add('opacity-25', 'line-through');
+                    }
+                });
+            } else {
+                const wrongTargets = arcadeState.targets.filter(t => !t.isCorrect && !t.hidden);
+                for (let i = wrongTargets.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [wrongTargets[i], wrongTargets[j]] = [wrongTargets[j], wrongTargets[i]];
+                }
+                wrongTargets.slice(0, 2).forEach(t => { t.hidden = true; });
             }
-            wrongTargets.slice(0, 2).forEach(t => { t.hidden = true; });
             updateLifelinesUI(q);
         });
 
