@@ -527,10 +527,10 @@
                     { type: "mcq", topic: "وحدات القياس", question: "أي من الوحدات تستخدم لقياس حجم جسم صلب صغير؟", options: ["لتر", "كغم", "سم³", "طن"], correctIndex: 2, explanation: "يُقاس حجم الأجسام الصلبة الصغيرة بوحدة السنتيمتر المكعب (سم³)." },
                     { type: "mcq", topic: "حجم الصندوق", question: "صندوق طوله 2 سم وعرضه 3 سم وارتفاعه 1 سم، ما حجمه؟", options: ["7 سم³", "6 سم", "10 سم³", "6 سم³"], correctIndex: 3, explanation: "الحجم = الطول × العرض × الارتفاع = 2 × 3 × 1 = 6 سم³." },
                     { type: "mcq", topic: "حجم المكعب", question: "مكعب طول ضلعه 3 سم، ما هو حجمه؟", options: ["9 سم³", "27 سم³", "6 سم³", "9 سم"], correctIndex: 1, explanation: "حجم المكعب = 3 × 3 × 3 = 27 سم³." },
-                    { type: "mcq", topic: "المخبار المدرج", question: "وضع طالب 30 سم³ ماءً في مخبار مدرج، عندما غمر حجر صغير ارتفع مستوى الماء إلى 42 سم³، ما هو حجم الحجر؟", options: ["12 سم³", "30 سم³", "42 سم³", "72 سم³"], correctIndex: 0, explanation: "حجم الحجر = 42 − 30 = 12 سم³." },
+                    { type: "mcq", topic: "المخبار المدرج", sim: { v1: 30, v2: 42, unit: "سم³", mode: "submerge", label: "حجر" }, question: "وضع طالب 30 سم³ ماءً في مخبار مدرج، عندما غمر حجر صغير ارتفع مستوى الماء إلى 42 سم³، ما هو حجم الحجر؟", options: ["12 سم³", "30 سم³", "42 سم³", "72 سم³"], correctIndex: 0, explanation: "حجم الحجر = 42 − 30 = 12 سم³." },
                     { type: "mcq", topic: "تحويل الوحدات", question: "مكعب حجمه 8 سم³، كم حجمه بوحدات الملل؟", options: ["10 ملل", "8 ملل", "64 ملل", "24 ملل"], correctIndex: 1, explanation: "كل 1 سم³ = 1 ملل، إذن 8 سم³ = 8 ملل." },
-                    { type: "mcq", topic: "المخبار المدرج", question: "مخبار مدرج يحوي ماء غير معلوم، وضع حجر حجمه 23 سم³ فارتفع الماء حتى 60 سم³، فما هو حجم الماء البدائي؟", options: ["60 سم³", "23 سم³", "37 سم³", "36 سم³"], correctIndex: 2, explanation: "الحجم البدائي = 60 − 23 = 37 سم³." },
-                    { type: "mcq", topic: "المخبار المدرج", question: "غُمِرَ جسم صلب غير منتظم في مخبار مدرج فارتفع مستوى الماء بمقدار 18 ملل. إذا كان حجم الماء الابتدائي 25 ملل، فما حجم الماء النهائي؟", options: ["7 ملل", "18 ملل", "43 ملل", "50 ملل"], correctIndex: 2, explanation: "الحجم النهائي = 25 + 18 = 43 ملل." },
+                    { type: "mcq", topic: "المخبار المدرج", sim: { v1: 37, v2: 60, unit: "سم³", mode: "mystery_v1", objVol: 23, label: "حجر" }, question: "مخبار مدرج يحوي ماء غير معلوم، وضع حجر حجمه 23 سم³ فارتفع الماء حتى 60 سم³، فما هو حجم الماء البدائي؟", options: ["60 سم³", "23 سم³", "37 سم³", "36 سم³"], correctIndex: 2, explanation: "الحجم البدائي = 60 − 23 = 37 سم³." },
+                    { type: "mcq", topic: "المخبار المدرج", sim: { v1: 25, v2: 43, unit: "ملل", mode: "mystery_v2", objVol: 18, label: "جسم صلب" }, question: "غُمِرَ جسم صلب غير منتظم في مخبار مدرج فارتفع مستوى الماء بمقدار 18 ملل. إذا كان حجم الماء الابتدائي 25 ملل، فما حجم الماء النهائي؟", options: ["7 ملل", "18 ملل", "43 ملل", "50 ملل"], correctIndex: 2, explanation: "الحجم النهائي = 25 + 18 = 43 ملل." },
                     { type: "mcq", topic: "تطبيقات الحجم", question: "كم مكعب حجمه 2 سم³ نستطيع إدخاله في صندوق حجمه 20 سم³؟", options: ["10 سم³", "10 مكعبات", "10 ملل", "10 لتر"], correctIndex: 1, explanation: "عدد المكعبات = 20 ÷ 2 = 10 مكعبات." },
                     { type: "mcq", topic: "تحويل الوحدات", question: "7.2 لتر كم تساوي بوحدات ملل؟", options: ["720 ملل", "0.72 ملل", "7200 ملل", "72.4 ملل"], correctIndex: 2, explanation: "7.2 × 1000 = 7200 ملل." }
                 ]
@@ -541,18 +541,18 @@
                 icon: "🧪",
                 color: "from-cyan-600 to-blue-700",
                 badge: "إزاحة السوائل",
-                description: "10 تجارب عملية لحساب حجم الأجسام غير المنتظمة باستخدام المخبار المدرج.",
+                description: "10 تجارب عملية بمحاكاة تفاعلية لحساب حجم الأجسام باستخدام المخبار المدرج.",
                 questions: [
-                    { type: "fill", topic: "إزاحة الماء", question: "ماء في مخبار حجمه 40 ملل، غُمر حجر فارتفع إلى 55 ملل. ما حجم الحجر بوحدة ملل؟ (اكتب الرقم فقط)", answer: "15", explanation: "حجم الحجر = 55 − 40 = 15 ملل." },
-                    { type: "mcq", topic: "الماء البدائي", question: "ارتفع الماء في مخبار إلى 75 سم³ بعد وضع مفتاح حجمه 15 سم³. كم كان حجم الماء البدائي؟", options: ["90 سم³", "60 سم³", "15 سم³", "50 سم³"], correctIndex: 1, explanation: "الحجم البدائي = 75 − 15 = 60 سم³." },
-                    { type: "mcq", topic: "الماء النهائي", question: "مخبار فيه 50 ملل ماء، غُمر فيه جسم حجمه 22 ملل. إلى أي قراءة سيرتفع الماء؟", options: ["28 ملل", "72 ملل", "62 ملل", "52 ملل"], correctIndex: 1, explanation: "الحجم النهائي = 50 + 22 = 72 ملل." },
-                    { type: "tf", topic: "مبدأ الإزاحة", question: "لقياس حجم جسم صلب غير منتظم الشكل مثل الحجر، نستخدم طريقة إزاحة الماء في المخبار المدرج.", correctBool: true, explanation: "صحيح! لأن الحجر غير منتظم الشكل ولا يمكن قياس أبعاده بالمسطرة." },
-                    { type: "fill", topic: "حساب الحجم", question: "مخبار به 25 سم³ ماء، أضيف له مكعب فارتفع الماء إلى 33 سم³. ما حجم المكعب بالسم³؟ (الرقم فقط)", answer: "8", explanation: "حجم المكعب = 33 − 25 = 8 سم³." },
-                    { type: "mcq", topic: "قراءة المخبار", question: "عند قراءة مستوى الماء في المخبار المدرج يجب أن يكون مستوى النظر:", options: ["أعلى من سطح الماء", "أسفل من سطح الماء", "أفقياً بمستوى قاع تقعّر سطح الماء", "بأي زاوية"], correctIndex: 2, explanation: "للحصول على قراءة دقيقة يجب النظر أفقياً عند أخفض نقطة في سطح السائل المقعر." },
-                    { type: "mcq", topic: "إزاحة الماء", question: "غُمر جسمان متماثلان معاً في مخبار به 20 ملل ماء فارتفع إلى 36 ملل. ما حجم الجسم الواحد؟", options: ["16 ملل", "8 ملل", "18 ملل", "6 ملل"], correctIndex: 1, explanation: "حجم الجسمين = 36 − 20 = 16 ملل، إذن حجم الجسم الواحد = 16 ÷ 2 = 8 ملل." },
-                    { type: "tf", topic: "شرط الغمر", question: "إذا طفا الجسم الخشبي فوق سطح الماء ولم يُغمر بالكامل، فإن مقدار ارتفاع الماء يساوي حجم الجسم كله.", correctBool: false, explanation: "خطأ! يجب غمر الجسم بالكامل تحت سطح الماء ليزيح حجماً يساوي حجمه الكلي." },
-                    { type: "fill", topic: "مخبار مدرج", question: "ارتفع مستوى الماء بمقدار 14 ملل بعد غمر مسمار في 36 ملل ماء. كم أصبحت القراءة النهائية بالملل؟", answer: "50", explanation: "36 + 14 = 50 ملل." },
-                    { type: "mcq", topic: "مخبار مدرج", question: "وُضعت كرة زجاجية حجمها 19 سم³ في مخبار فوصلت القراءة إلى 80 سم³. كم كان الماء البدائي؟", options: ["61 سم³", "99 سم³", "59 سم³", "71 سم³"], correctIndex: 0, explanation: "80 − 19 = 61 سم³." }
+                    { type: "fill", topic: "إزاحة الماء", sim: { v1: 40, v2: 55, unit: "ملل", mode: "submerge", label: "حجر" }, question: "ماء في مخبار حجمه 40 ملل، غُمر حجر فارتفع إلى 55 ملل. ما حجم الحجر بوحدة ملل؟ (اكتب الرقم فقط)", answer: "15", explanation: "حجم الحجر = 55 − 40 = 15 ملل." },
+                    { type: "mcq", topic: "الماء البدائي", sim: { v1: 60, v2: 75, unit: "سم³", mode: "mystery_v1", objVol: 15, label: "مفتاح" }, question: "ارتفع الماء في مخبار إلى 75 سم³ بعد وضع مفتاح حجمه 15 سم³. كم كان حجم الماء البدائي؟", options: ["90 سم³", "60 سم³", "15 سم³", "50 سم³"], correctIndex: 1, explanation: "الحجم البدائي = 75 − 15 = 60 سم³." },
+                    { type: "mcq", topic: "الماء النهائي", sim: { v1: 50, v2: 72, unit: "ملل", mode: "mystery_v2", objVol: 22, label: "جسم صلب" }, question: "مخبار فيه 50 ملل ماء، غُمر فيه جسم حجمه 22 ملل. إلى أي قراءة سيرتفع الماء؟", options: ["28 ملل", "72 ملل", "62 ملل", "52 ملل"], correctIndex: 1, explanation: "الحجم النهائي = 50 + 22 = 72 ملل." },
+                    { type: "tf", topic: "مبدأ الإزاحة", sim: { v1: 35, v2: 50, unit: "سم³", mode: "submerge", label: "حجر غير منتظم" }, question: "لقياس حجم جسم صلب غير منتظم الشكل مثل الحجر، نستخدم طريقة إزاحة الماء في المخبار المدرج.", correctBool: true, explanation: "صحيح! لأن الحجر غير منتظم الشكل ولا يمكن قياس أبعاده بالمسطرة." },
+                    { type: "fill", topic: "حساب الحجم", sim: { v1: 25, v2: 33, unit: "سم³", mode: "submerge", label: "مكعب" }, question: "مخبار به 25 سم³ ماء، أضيف له مكعب فارتفع الماء إلى 33 سم³. ما حجم المكعب بالسم³؟ (الرقم فقط)", answer: "8", explanation: "حجم المكعب = 33 − 25 = 8 سم³." },
+                    { type: "mcq", topic: "قراءة المخبار", sim: { v1: 50, v2: 50, unit: "ملل", mode: "eye_level", label: "سطح مقعّر" }, question: "عند قراءة مستوى الماء في المخبار المدرج يجب أن يكون مستوى النظر:", options: ["أعلى من سطح الماء", "أسفل من سطح الماء", "أفقياً بمستوى قاع تقعّر سطح الماء", "بأي زاوية"], correctIndex: 2, explanation: "للحصول على قراءة دقيقة يجب النظر أفقياً عند أخفض نقطة في سطح السائل المقعر." },
+                    { type: "mcq", topic: "إزاحة الماء", sim: { v1: 20, v2: 36, unit: "ملل", mode: "two_stones", label: "جسمان متماثلان" }, question: "غُمر جسمان متماثلان معاً في مخبار به 20 ملل ماء فارتفع إلى 36 ملل. ما حجم الجسم الواحد؟", options: ["16 ملل", "8 ملل", "18 ملل", "6 ملل"], correctIndex: 1, explanation: "حجم الجسمين = 36 − 20 = 16 ملل، إذن حجم الجسم الواحد = 16 ÷ 2 = 8 ملل." },
+                    { type: "tf", topic: "شرط الغمر", sim: { v1: 40, v2: 45, unit: "ملل", mode: "floating", label: "قطعة خشب طافية" }, question: "إذا طفا الجسم الخشبي فوق سطح الماء ولم يُغمر بالكامل، فإن مقدار ارتفاع الماء يساوي حجم الجسم كله.", correctBool: false, explanation: "خطأ! يجب غمر الجسم بالكامل تحت سطح الماء ليزيح حجماً يساوي حجمه الكلي." },
+                    { type: "fill", topic: "مخبار مدرج", sim: { v1: 36, v2: 50, unit: "ملل", mode: "mystery_v2", objVol: 14, label: "مسمار" }, question: "ارتفع مستوى الماء بمقدار 14 ملل بعد غمر مسمار في 36 ملل ماء. كم أصبحت القراءة النهائية بالملل؟", answer: "50", explanation: "36 + 14 = 50 ملل." },
+                    { type: "mcq", topic: "مخبار مدرج", sim: { v1: 61, v2: 80, unit: "سم³", mode: "mystery_v1", objVol: 19, label: "كرة زجاجية" }, question: "وُضعت كرة زجاجية حجمها 19 سم³ في مخبار فوصلت القراءة إلى 80 سم³. كم كان الماء البدائي؟", options: ["61 سم³", "99 سم³", "59 سم³", "71 سم³"], correctIndex: 0, explanation: "80 − 19 = 61 سم³." }
                 ]
             },
             {
@@ -1023,6 +1023,133 @@
             });
         }
 
+        function renderQuizVisual(q, container) {
+            if (!q.sim) {
+                container.innerHTML = getVisualHTML(q);
+                return;
+            }
+
+            const s = q.sim;
+            const maxScale = Math.max(80, Math.ceil((s.v2 + 15) / 10) * 10);
+            const yFromVol = (v) => 126 - (v / maxScale) * 96; // cylinder bottom=126, top=30
+            const y1 = yFromVol(s.v1);
+            const y2 = yFromVol(s.v2);
+
+            const v1Display = (s.mode === 'mystery_v1') ? `؟ ${s.unit}` : `${s.v1} ${s.unit}`;
+            const v2Display = (s.mode === 'mystery_v2') ? `؟ ${s.unit}` : `${s.v2} ${s.unit}`;
+
+            let objectSVG = `<path d="M53 12 Q49 4 58 2 Q67 1 69 9 Q70 16 60 17 Q54 17 53 12 Z" fill="#94a3b8" stroke="#f1f5f9" stroke-width="1.5"/>`;
+            if (s.mode === 'two_stones') {
+                objectSVG = `
+                    <circle cx="52" cy="10" r="6" fill="#94a3b8" stroke="#f1f5f9" stroke-width="1.5"/>
+                    <circle cx="68" cy="10" r="6" fill="#94a3b8" stroke="#f1f5f9" stroke-width="1.5"/>
+                `;
+            } else if (s.mode === 'floating') {
+                objectSVG = `<rect x="47" y="4" width="26" height="14" rx="2" fill="#d97706" stroke="#fef3c7" stroke-width="1.5"/>`;
+            } else if (s.mode === 'eye_level') {
+                objectSVG = ``;
+            }
+
+            container.innerHTML = `
+                <div class="w-full flex flex-col items-center">
+                    <div class="flex items-center justify-between w-full mb-1 px-1">
+                        <span class="text-[11px] font-extrabold text-cyan-300">🧪 محاكاة المخبار</span>
+                        <span id="sim-status-pill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-600">
+                            ${s.mode === 'eye_level' ? 'انقر لمعاينة القراءة' : `قبل الغمر: ${v1Display}`}
+                        </span>
+                    </div>
+                    <svg viewBox="0 0 180 142" class="w-full max-w-[200px] h-32">
+                        <!-- Base -->
+                        <rect x="34" y="128" width="52" height="7" rx="3" fill="#cbd5e1"/>
+                        <!-- Cylinder Glass -->
+                        <rect x="42" y="24" width="36" height="104" rx="4" fill="rgba(255,255,255,0.08)" stroke="#94a3b8" stroke-width="2"/>
+                        <!-- Animated Water -->
+                        <rect id="sim-water-rect" x="44" y="${y1}" width="32" height="${126 - y1}" rx="2" fill="#06b6d4" opacity="0.82" style="transition: all 1.1s ease-in-out;"/>
+                        <path id="sim-meniscus" d="M44 ${y1} Q60 ${y1 + 5} 76 ${y1}" fill="none" stroke="#67e8f9" stroke-width="2.5" style="transition: all 1.1s ease-in-out;"/>
+
+                        <!-- Scale Ticks -->
+                        ${[0.25, 0.5, 0.75, 1].map(frac => {
+                            const ty = 126 - frac * 96;
+                            const val = Math.round(frac * maxScale);
+                            return `<line x1="42" y1="${ty}" x2="52" y2="${ty}" stroke="#e2e8f0" stroke-width="1.5"/>
+                                    <text x="38" y="${ty + 3}" text-anchor="end" fill="#94a3b8" font-size="8" font-family="Cairo">${val}</text>`;
+                        }).join('')}
+
+                        <!-- Object Group -->
+                        <g id="sim-object-group" transform="translate(0, 0)" style="transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                            ${objectSVG}
+                        </g>
+
+                        <!-- Eye level sightline for eye_level mode -->
+                        ${s.mode === 'eye_level' ? `
+                            <g id="sim-eye-group" opacity="0.25" style="transition: opacity 0.6s;">
+                                <line x1="60" y1="${y1 + 2.5}" x2="132" y2="${y1 + 2.5}" stroke="#fde047" stroke-width="2" stroke-dasharray="4 3"/>
+                                <text x="148" y="${y1 + 6}" text-anchor="middle" font-size="15">👁️</text>
+                                <text x="145" y="${y1 + 20}" text-anchor="middle" fill="#fde047" font-size="8" font-weight="bold" font-family="Cairo">قاع التقعّر</text>
+                            </g>
+                        ` : `
+                            <!-- Labels on right -->
+                            <text x="92" y="${y1 + 3}" fill="#a7f3d0" font-size="9" font-weight="bold" font-family="Cairo">قبل: ${v1Display}</text>
+                            <text id="sim-v2-label" x="92" y="${y2 - 2}" fill="#fde047" font-size="9" font-weight="bold" font-family="Cairo" opacity="0">بعد: ${v2Display}</text>
+                        `}
+                    </svg>
+                    <button id="btn-run-sim" type="button" class="mt-1 w-full py-1.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs shadow transition flex items-center justify-center gap-1.5">
+                        <span>▶️</span>
+                        <span id="sim-btn-text">${s.mode === 'eye_level' ? 'عرض خط النظر الصحيح' : `غمر (${s.label}) في الماء`}</span>
+                    </button>
+                </div>
+            `;
+
+            let simulated = false;
+            const btnRun = container.querySelector('#btn-run-sim');
+            const waterRect = container.querySelector('#sim-water-rect');
+            const meniscus = container.querySelector('#sim-meniscus');
+            const objGroup = container.querySelector('#sim-object-group');
+            const statusPill = container.querySelector('#sim-status-pill');
+            const v2Label = container.querySelector('#sim-v2-label');
+            const eyeGroup = container.querySelector('#sim-eye-group');
+            const btnText = container.querySelector('#sim-btn-text');
+
+            btnRun.addEventListener('click', () => {
+                if (!simulated) {
+                    simulated = true;
+                    if (s.mode === 'eye_level') {
+                        if (eyeGroup) eyeGroup.setAttribute('opacity', '1');
+                        statusPill.textContent = "المستوى الأفقي الصحيح ✅";
+                        btnText.textContent = "إعادة المعاينة";
+                    } else {
+                        const dropY = (s.mode === 'floating') ? (y2 - 11) : 104;
+                        objGroup.setAttribute('transform', `translate(0, ${dropY})`);
+                        setTimeout(() => {
+                            waterRect.setAttribute('y', y2);
+                            waterRect.setAttribute('height', 126 - y2);
+                            meniscus.setAttribute('d', `M44 ${y2} Q60 ${y2 + 5} 76 ${y2}`);
+                            if (v2Label) v2Label.setAttribute('opacity', '1');
+                            statusPill.textContent = (s.mode === 'floating')
+                                ? "طفا فوق الماء (غمر غير كامل!)"
+                                : `بعد الغمر: ${v2Display}`;
+                        }, 350);
+                        btnText.textContent = "🔄 إعادة التجربة";
+                    }
+                } else {
+                    simulated = false;
+                    if (s.mode === 'eye_level') {
+                        if (eyeGroup) eyeGroup.setAttribute('opacity', '0.25');
+                        statusPill.textContent = "انقر لمعاينة القراءة";
+                        btnText.textContent = "عرض خط النظر الصحيح";
+                    } else {
+                        objGroup.setAttribute('transform', 'translate(0, 0)');
+                        waterRect.setAttribute('y', y1);
+                        waterRect.setAttribute('height', 126 - y1);
+                        meniscus.setAttribute('d', `M44 ${y1} Q60 ${y1 + 5} 76 ${y1}`);
+                        if (v2Label) v2Label.setAttribute('opacity', '0');
+                        statusPill.textContent = `قبل الغمر: ${v1Display}`;
+                        btnText.textContent = `غمر (${s.label}) في الماء`;
+                    }
+                }
+            });
+        }
+
         function getVisualHTML(q) {
             const iconByType = {
                 mcq: "🔬",
@@ -1053,7 +1180,7 @@
             document.getElementById('quiz-progress-bar').style.width = `${(num / total) * 100}%`;
 
             document.getElementById('quiz-question-text').textContent = q.question;
-            document.getElementById('quiz-visual-box').innerHTML = getVisualHTML(q);
+            renderQuizVisual(q, document.getElementById('quiz-visual-box'));
             document.getElementById('quiz-feedback-box').classList.add('hidden');
             document.getElementById('next-btn-text').textContent = (num === total) ? "عرض النتيجة النهائية" : "السؤال التالي";
 
