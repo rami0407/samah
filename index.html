@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics-compat.js"></script>
     <style>
         html, body {
             font-family: 'Cairo', sans-serif;
@@ -952,7 +955,30 @@
         ];
 
         // ============================================================
-        // STORAGE (LOCALSTORAGE PERSISTENCE FOR TEACHER PANEL)
+        // FIREBASE REALTIME DATABASE & ANALYTICS CONNECTION
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsSC2-SB86mDC9XPUWnC1hV-4Fxx07bJg",
+            authDomain: "samah-ce883.firebaseapp.com",
+            databaseURL: "https://samah-ce883-default-rtdb.firebaseio.com",
+            projectId: "samah-ce883",
+            storageBucket: "samah-ce883.firebasestorage.app",
+            messagingSenderId: "282603830313",
+            appId: "1:282603830313:web:c479dc48e7be4385a47038",
+            measurementId: "G-ECB4VKFFH3"
+        };
+
+        let db = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                const fbApp = firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                if (firebase.analytics) firebase.analytics(fbApp);
+            }
+        } catch (e) { console.warn("Firebase init warning:", e); }
+
+        // ============================================================
+        // STORAGE (FIREBASE SYNC + LOCALSTORAGE FALLBACK)
         // ============================================================
         const STORAGE_KEY = "ara_school_volume_games_v4";
 
@@ -972,9 +998,26 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
             } catch (e) {}
+            if (db) {
+                db.ref('games').set(games).catch(err => console.warn("Firebase save games error:", err));
+            }
         }
 
         let GAMES_DATA = loadGamesData();
+
+        if (db) {
+            db.ref('games').on('value', (snap) => {
+                const val = snap.val();
+                if (Array.isArray(val) && val.length === DEFAULT_GAMES.length) {
+                    GAMES_DATA = val;
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(val)); } catch (e) {}
+                    if (typeof renderLandingGrid === 'function') renderLandingGrid();
+                } else if (!val) {
+                    // Seed default games on first run
+                    db.ref('games').set(GAMES_DATA).catch(() => {});
+                }
+            });
+        }
 
         // ============================================================
         // SOUND ENGINE (WEB AUDIO API)
@@ -2588,7 +2631,8 @@
         document.getElementById('btn-reset-all-questions').addEventListener('click', () => {
             if (confirm("هل تريدين استعادة جميع الأسئلة الافتراضية للألعاب العشر؟")) {
                 localStorage.removeItem(STORAGE_KEY);
-                GAMES_DATA = loadGamesData();
+                GAMES_DATA = JSON.parse(JSON.stringify(DEFAULT_GAMES));
+                saveGamesData(GAMES_DATA);
                 openTeacherPanel();
                 renderLandingGrid();
             }
@@ -2694,14 +2738,40 @@
         document.getElementById('btn-print-cert').addEventListener('click', () => window.print());
 
         const LEADERBOARD_KEY = "ara_school_volume_leaderboard_v1";
+        let firebaseLeaderboard = [];
+
+        if (db) {
+            db.ref('leaderboard').orderByChild('score').limitToLast(30).on('value', (snap) => {
+                const items = [];
+                snap.forEach(child => { items.push(child.val()); });
+                items.sort((a, b) => (b.score || 0) - (a.score || 0));
+                firebaseLeaderboard = items;
+                try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(items.slice(0, 20))); } catch (e) {}
+                if (!document.getElementById('modal-leaderboard').classList.contains('hidden')) {
+                    renderLeaderboardModal();
+                }
+            });
+        }
+
         function loadLeaderboard() {
+            if (firebaseLeaderboard.length > 0) return firebaseLeaderboard;
             try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]"); } catch (e) { return []; }
         }
         function saveToLeaderboard(entry) {
+            const payload = {
+                name: String(entry.name || "بطل العلوم").slice(0, 50),
+                mode: String(entry.mode || "فردي"),
+                gameTitle: String(entry.gameTitle || "العلوم"),
+                score: Number(entry.score) || 0,
+                date: new Date().toLocaleDateString('ar-EG')
+            };
             const list = loadLeaderboard();
-            list.unshift({ ...entry, date: new Date().toLocaleDateString('ar-EG') });
+            list.unshift(payload);
             list.sort((a, b) => b.score - a.score);
             try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list.slice(0, 20))); } catch (e) {}
+            if (db) {
+                db.ref('leaderboard').push(payload).catch(err => console.warn("Firebase leaderboard error:", err));
+            }
         }
         function renderLeaderboardModal() {
             const container = document.getElementById('leaderboard-list');
@@ -2739,6 +2809,8 @@
         document.getElementById('btn-clear-leaderboard').addEventListener('click', () => {
             if (confirm("هل تريدين مسح سجل لوحة الشرف؟")) {
                 localStorage.removeItem(LEADERBOARD_KEY);
+                firebaseLeaderboard = [];
+                if (db) db.ref('leaderboard').remove().catch(() => {});
                 renderLeaderboardModal();
             }
         });
