@@ -3778,23 +3778,20 @@ ${contextSummary || "لا يوجد نص بعد."}
                 generationConfig: { temperature: 0.7, maxOutputTokens: 350 }
             };
 
-            const isAIStudioKey = INQUIRY_AI_KEY.startsWith("AIza");
-            const endpoints = isAIStudioKey
-                ? [
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`,
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`
-                ]
-                : [
-                    `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`,
-                    `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`
-                ];
+            const endpoints = [
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
+            ];
 
             if (INQUIRY_AI_KEY) {
                 for (const url of endpoints) {
                     try {
                         const res = await fetch(url, {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers: {
+                                "Content-Type": "application/json",
+                                "x-goog-api-key": INQUIRY_AI_KEY
+                            },
                             body: JSON.stringify(payload)
                         });
                         if (res.ok) {
