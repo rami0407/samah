@@ -3778,10 +3778,16 @@ ${contextSummary || "لا يوجد نص بعد."}
                 generationConfig: { temperature: 0.7, maxOutputTokens: 350 }
             };
 
-            const endpoints = [
-                `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`,
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`
-            ];
+            const isAIStudioKey = INQUIRY_AI_KEY.startsWith("AIza");
+            const endpoints = isAIStudioKey
+                ? [
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`,
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`
+                ]
+                : [
+                    `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`,
+                    `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(INQUIRY_AI_KEY)}`
+                ];
 
             if (INQUIRY_AI_KEY) {
                 for (const url of endpoints) {
