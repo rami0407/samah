@@ -380,17 +380,13 @@
             <!-- Fallback / Optional Interaction Area (kept empty for canvas-native games) -->
             <div id="quiz-interaction-area" class="hidden mb-4"></div>
 
-            <!-- Feedback & Explanation Box -->
-            <div id="quiz-feedback-box" class="hidden rounded-2xl p-4 sm:p-5 border-2 mb-4 transition-all">
-                <div class="flex items-start gap-3">
-                    <div id="feedback-icon" class="text-3xl shrink-0"></div>
-                    <div class="flex-1">
-                        <h4 id="feedback-title" class="font-black text-base sm:text-lg mb-1"></h4>
-                        <p id="feedback-explanation" class="text-sm sm:text-base font-semibold leading-relaxed"></p>
-                    </div>
-                </div>
-                <div class="mt-4 flex justify-end">
-                    <button id="btn-next-question" type="button" class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm sm:text-base shadow-md transition flex items-center gap-2">
+            <!-- Centered Feedback & Next Question Popup Modal -->
+            <div id="quiz-feedback-box" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+                <div id="feedback-modal-card" class="w-full max-w-md rounded-3xl p-6 border-4 shadow-2xl text-center transition-all">
+                    <div id="feedback-icon" class="text-6xl mb-2"></div>
+                    <h4 id="feedback-title" class="font-black text-xl sm:text-2xl mb-2"></h4>
+                    <p id="feedback-explanation" class="text-sm sm:text-base font-bold leading-relaxed mb-5 bg-white/70 rounded-2xl p-3 border border-black/10"></p>
+                    <button id="btn-next-question" type="button" class="w-full py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-base sm:text-lg shadow-xl border-b-4 border-slate-700 active:border-b-0 active:translate-y-1 transition flex items-center justify-center gap-2">
                         <span id="next-btn-text">السؤال التالي</span>
                         <span>⬅️</span>
                     </button>
@@ -2751,6 +2747,7 @@
             stopQuestionTimer();
             updateLifelinesUI(q);
             const feedbackBox = document.getElementById('quiz-feedback-box');
+            const feedbackCard = document.getElementById('feedback-modal-card');
             const feedbackIcon = document.getElementById('feedback-icon');
             const feedbackTitle = document.getElementById('feedback-title');
             const feedbackExplanation = document.getElementById('feedback-explanation');
@@ -2767,9 +2764,9 @@
                 }
 
                 playTone('correct');
-                confetti({ particleCount: 40, spread: 55, origin: { y: 0.7 } });
+                confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
 
-                feedbackBox.className = "rounded-2xl p-4 sm:p-5 border-2 border-emerald-400 bg-emerald-50 text-emerald-950 mb-4";
+                feedbackCard.className = "w-full max-w-md rounded-3xl p-6 border-4 border-emerald-500 bg-emerald-50 text-emerald-950 shadow-2xl text-center transition-all";
                 feedbackIcon.textContent = "✅";
                 feedbackTitle.textContent = appState.mode === 'group'
                     ? `أحسنت يا ${appState.groups[appState.activeGroupIndex].name}! (+10 نقاط)`
@@ -2778,7 +2775,7 @@
                 appState.streak = 0;
                 playTone('wrong');
 
-                feedbackBox.className = "rounded-2xl p-4 sm:p-5 border-2 border-rose-300 bg-rose-50 text-rose-950 mb-4";
+                feedbackCard.className = "w-full max-w-md rounded-3xl p-6 border-4 border-rose-400 bg-rose-50 text-rose-950 shadow-2xl text-center transition-all";
                 feedbackIcon.textContent = "💡";
                 feedbackTitle.textContent = `إجابة غير صحيحة — الصواب هو: ${correctText}`;
             }
@@ -2786,9 +2783,14 @@
             feedbackExplanation.textContent = q.explanation || "";
             document.getElementById('quiz-score').textContent = appState.score;
             document.getElementById('quiz-streak').textContent = appState.streak;
-            feedbackBox.classList.remove('hidden');
             renderGroupScoreboard();
             triggerArcadeAction(isCorrect);
+
+            const game = GAMES_DATA.find(g => g.id === appState.selectedGameId);
+            const delay = (game?.arena || 'classic') === 'classic' ? 80 : 450;
+            setTimeout(() => {
+                if (appState.answered) feedbackBox.classList.remove('hidden');
+            }, delay);
 
             appState.history.push({
                 question: q.question,
