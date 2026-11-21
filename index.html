@@ -365,6 +365,21 @@
         </div>
     </div>
 
+    <!-- MODAL: TEACHER PIN PROMPT -->
+    <div id="modal-teacher-pin" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border-4 border-amber-400 text-center">
+            <div class="text-4xl mb-2">🔐</div>
+            <h3 class="text-xl font-black text-slate-900 mb-1">دخول لوحة تحكم المعلمة</h3>
+            <p class="text-xs text-slate-500 font-bold mb-4">أدخلي الكود السري للمتابعة (خاص بالمعلمة سماح ارفاعية)</p>
+            <input id="teacher-pin-input" type="password" inputmode="numeric" maxlength="12" placeholder="أدخلي الكود السري..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 focus:outline-none font-black text-center text-lg tracking-widest mb-2">
+            <p id="teacher-pin-error" class="hidden text-xs font-extrabold text-rose-600 mb-3">❌ الكود السري غير صحيح، حاولي مرة أخرى.</p>
+            <div class="flex gap-2 mt-3">
+                <button id="btn-cancel-pin" type="button" class="flex-1 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold text-sm transition">إلغاء</button>
+                <button id="btn-submit-pin" type="button" class="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow transition">دخول</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: TEACHER CONTROL PANEL -->
     <div id="modal-teacher" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
         <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl border-4 border-amber-400 max-h-[92vh] flex flex-col">
@@ -1527,10 +1542,39 @@
         });
 
         // ============================================================
-        // GLOBAL LISTENERS & INIT
+        // TEACHER PIN GATE & GLOBAL LISTENERS
         // ============================================================
-        document.getElementById('btn-teacher-panel').addEventListener('click', openTeacherPanel);
-        document.getElementById('btn-open-teacher-from-hero').addEventListener('click', openTeacherPanel);
+        const TEACHER_PIN = "270779";
+        const modalTeacherPin = document.getElementById('modal-teacher-pin');
+        const teacherPinInput = document.getElementById('teacher-pin-input');
+        const teacherPinError = document.getElementById('teacher-pin-error');
+
+        function requestTeacherPanel() {
+            teacherPinInput.value = "";
+            teacherPinError.classList.add('hidden');
+            modalTeacherPin.classList.remove('hidden');
+            setTimeout(() => teacherPinInput.focus(), 50);
+        }
+
+        function verifyTeacherPin() {
+            if (teacherPinInput.value.trim() === TEACHER_PIN) {
+                modalTeacherPin.classList.add('hidden');
+                openTeacherPanel();
+            } else {
+                teacherPinError.classList.remove('hidden');
+                teacherPinInput.classList.add('shake-anim', 'border-rose-500');
+                setTimeout(() => teacherPinInput.classList.remove('shake-anim', 'border-rose-500'), 500);
+                teacherPinInput.select();
+            }
+        }
+
+        document.getElementById('btn-submit-pin').addEventListener('click', verifyTeacherPin);
+        document.getElementById('btn-cancel-pin').addEventListener('click', () => modalTeacherPin.classList.add('hidden'));
+        modalTeacherPin.addEventListener('click', (e) => { if (e.target === modalTeacherPin) modalTeacherPin.classList.add('hidden'); });
+        teacherPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') verifyTeacherPin(); });
+
+        document.getElementById('btn-teacher-panel').addEventListener('click', requestTeacherPanel);
+        document.getElementById('btn-open-teacher-from-hero').addEventListener('click', requestTeacherPanel);
         document.getElementById('btn-close-teacher').addEventListener('click', () => modalTeacher.classList.add('hidden'));
 
         document.getElementById('btn-quick-race').addEventListener('click', () => openGameSetup('champions-race'));
