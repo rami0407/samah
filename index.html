@@ -3778,31 +3778,64 @@ ${contextSummary || "لا يوجد نص بعد."}
                 generationConfig: { temperature: 0.7, maxOutputTokens: 350 }
             };
 
-            const endpoints = [
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
-            ];
-
             if (INQUIRY_AI_KEY) {
-                for (const url of endpoints) {
-                    try {
-                        const res = await fetch(url, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "x-goog-api-key": INQUIRY_AI_KEY
-                            },
-                            body: JSON.stringify(payload)
-                        });
-                        if (res.ok) {
-                            const data = await res.json();
-                            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                            if (reply) {
-                                inqAiStatus.textContent = "متصل بالذكاء الاصطناعي ✨";
-                                return reply.trim();
+                if (INQUIRY_AI_KEY.startsWith("sk-or-")) {
+                    const orModels = ["openrouter/free", "google/gemini-2.0-flash-001", "openai/gpt-4o-mini"];
+                    for (const model of orModels) {
+                        try {
+                            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${INQUIRY_AI_KEY}`,
+                                    "HTTP-Referer": window.location.origin || "https://rami0407.github.io/samah/",
+                                    "X-Title": "Ara Comprehensive School Science Lab"
+                                },
+                                body: JSON.stringify({
+                                    model,
+                                    messages: [
+                                        { role: "system", content: systemPrompt },
+                                        { role: "user", content: userPrompt }
+                                    ],
+                                    temperature: 0.7,
+                                    max_tokens: 350
+                                })
+                            });
+                            if (res.ok) {
+                                const data = await res.json();
+                                const reply = data?.choices?.[0]?.message?.content;
+                                if (reply) {
+                                    inqAiStatus.textContent = "متصل بالذكاء الاصطناعي ✨";
+                                    return reply.trim();
+                                }
                             }
-                        }
-                    } catch (e) {}
+                        } catch (e) {}
+                    }
+                } else {
+                    const endpoints = [
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
+                    ];
+                    for (const url of endpoints) {
+                        try {
+                            const res = await fetch(url, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "x-goog-api-key": INQUIRY_AI_KEY
+                                },
+                                body: JSON.stringify(payload)
+                            });
+                            if (res.ok) {
+                                const data = await res.json();
+                                const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (reply) {
+                                    inqAiStatus.textContent = "متصل بالذكاء الاصطناعي ✨";
+                                    return reply.trim();
+                                }
+                            }
+                        } catch (e) {}
+                    }
                 }
             }
 
