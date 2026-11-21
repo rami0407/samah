@@ -56,6 +56,53 @@
         .shake-anim {
             animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
         }
+        /* Full-Page Immersive Game Theater Mode for the 9 Arcade Games */
+        body.arcade-theater-mode {
+            padding: 0 !important;
+            background: #020617 !important;
+        }
+        body.arcade-theater-mode > header,
+        body.arcade-theater-mode > footer {
+            display: none !important;
+        }
+        body.arcade-theater-mode main {
+            max-width: 100% !important;
+            width: 100% !important;
+            min-height: 100dvh !important;
+        }
+        body.arcade-theater-mode #view-quiz {
+            border-radius: 0 !important;
+            border: none !important;
+            background: radial-gradient(circle at top, #0f172a 0%, #020617 100%) !important;
+            color: #f8fafc !important;
+            min-height: 100dvh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 10px 14px !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        body.arcade-theater-mode #game-arena-box {
+            flex: 1 1 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 360px !important;
+            border-color: rgba(16, 185, 129, 0.45) !important;
+        }
+        body.arcade-theater-mode #arcade-canvas {
+            flex: 1 1 auto !important;
+            height: 100% !important;
+            min-height: 340px !important;
+            max-height: 68dvh !important;
+        }
+        body.arcade-theater-mode #lifelines-bar {
+            background: rgba(15, 23, 42, 0.85) !important;
+            border-color: rgba(51, 65, 85, 0.8) !important;
+            color: #e2e8f0 !important;
+        }
+        body.arcade-theater-mode #lifelines-bar span.text-slate-600 {
+            color: #cbd5e1 !important;
+        }
         @keyframes shake {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
             20%, 80% { transform: translate3d(4px, 0, 0); }
@@ -198,6 +245,24 @@
 
         <!-- VIEW 2: GAMEPLAY SCREEN -->
         <section id="view-quiz" class="hidden glass-card rounded-3xl p-5 sm:p-8 transition-all duration-300 my-auto">
+            <!-- Full-Page Theater Top Bar (Back & Fullscreen) -->
+            <div id="theater-top-bar" class="hidden flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <button id="btn-theater-back" type="button" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs sm:text-sm border border-slate-600 transition flex items-center gap-1.5">
+                        <span>🏠</span>
+                        <span>العودة لبوابة الألعاب</span>
+                    </button>
+                    <span class="hidden sm:inline text-xs font-bold text-emerald-300">مدرسة عارة الشاملة • الصف السابع</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-theater-fullscreen" type="button" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm border border-emerald-400/50 transition flex items-center gap-1.5">
+                        <span>⛶</span>
+                        <span>شاشة كاملة</span>
+                    </button>
+                    <button id="btn-theater-sound" type="button" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center border border-slate-600">🔊</button>
+                </div>
+            </div>
+
             <!-- Group Scoreboard (visible only in Group Mode) -->
             <div id="group-scoreboard-bar" class="hidden mb-5 bg-slate-900 text-white rounded-2xl p-3.5 border-2 border-amber-400/70 shadow-lg">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
@@ -247,7 +312,7 @@
             </div>
 
             <!-- Lifelines Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-100/90 border border-slate-200 rounded-2xl px-3.5 py-2">
+            <div id="lifelines-bar" class="flex flex-wrap items-center justify-between gap-2 mb-3 bg-slate-100/90 border border-slate-200 rounded-2xl px-3.5 py-2">
                 <span class="text-xs font-extrabold text-slate-600">🃏 بطاقات المساعدة (مرة واحدة لكل لاعب/مجموعة):</span>
                 <div class="flex items-center gap-2">
                     <button id="btn-lifeline-5050" type="button" class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs shadow transition flex items-center gap-1">
@@ -288,8 +353,8 @@
             <div id="quiz-visual-box" class="hidden mb-3 bg-gradient-to-br from-slate-900 to-teal-950 rounded-2xl p-3 border-2 border-cyan-500/50 text-white shadow-md"></div>
 
             <!-- Interactive 60FPS HTML5 Canvas Game Console -->
-            <div id="game-arena-box" class="mb-4 rounded-2xl overflow-hidden border-4 border-slate-800 shadow-2xl bg-slate-950 text-white relative">
-                <canvas id="arcade-canvas" width="760" height="360" class="w-full h-[260px] sm:h-[340px] block cursor-pointer touch-none"></canvas>
+            <div id="game-arena-box" class="mb-3 rounded-2xl overflow-hidden border-2 border-emerald-500/40 shadow-2xl bg-slate-950 text-white relative">
+                <canvas id="arcade-canvas" width="1000" height="520" class="w-full h-[320px] sm:h-[440px] block cursor-pointer touch-none"></canvas>
 
                 <!-- Mobile / Touch D-Pad & Action Controls (shown for Snake, Car Race, Star Wars) -->
                 <div id="arcade-dpad" class="hidden bg-slate-900/95 border-t border-slate-800 px-3 py-2 flex items-center justify-between gap-2">
@@ -1140,6 +1205,10 @@
         function showView(view) {
             if (view !== viewQuiz && typeof stopQuestionTimer === 'function') stopQuestionTimer();
             if (view !== viewQuiz && typeof stopArcade === 'function') stopArcade();
+            if (view !== viewQuiz) {
+                document.body.classList.remove('arcade-theater-mode');
+                document.getElementById('theater-top-bar').classList.add('hidden');
+            }
             [viewLanding, viewQuiz, viewResults].forEach(v => v.classList.add('hidden'));
             view.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1284,8 +1353,12 @@
             showView(viewQuiz);
             if ((game.arena || 'classic') === 'classic') {
                 stopArcade();
+                document.body.classList.remove('arcade-theater-mode');
+                document.getElementById('theater-top-bar').classList.add('hidden');
                 document.getElementById('game-arena-box').classList.add('hidden');
             } else {
+                document.body.classList.add('arcade-theater-mode');
+                document.getElementById('theater-top-bar').classList.remove('hidden');
                 document.getElementById('game-arena-box').classList.remove('hidden');
                 initArcade(game.arena);
             }
@@ -1611,55 +1684,53 @@
         function setupQuestionTargets(q) {
             const choices = buildCanvasChoices(q);
             const arena = arcadeState.arena;
-            const W = 760, H = 360;
+            const W = 1000, H = 520;
             arcadeState.bullets = [];
             arcadeState.action = "idle";
             arcadeState.actionTimer = 0;
+            arcadeState.arrow = null;
+            arcadeState.shipPos = { x: 500, y: 440, tx: 500, ty: 440 };
+            arcadeState.hoverPodX = 500;
+            arcadeState.hoverPodTargetX = 500;
+            arcadeState.cutWireTarget = null;
+            arcadeState.craneDrop = null;
 
             if (arena === 'snake') {
-                arcadeState.snake = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 8, y: 6 }];
+                arcadeState.snake = [{ x: 12, y: 6 }, { x: 11, y: 6 }, { x: 10, y: 6 }, { x: 9, y: 6 }];
                 arcadeState.snakeDir = { x: 1, y: 0 };
-                const spots = [{ gx: 18, gy: 3 }, { gx: 22, gy: 8 }, { gx: 6, gy: 2 }, { gx: 4, gy: 9 }];
+                const spots = [{ gx: 19, gy: 3 }, { gx: 20, gy: 9 }, { gx: 5, gy: 3 }, { gx: 6, gy: 9 }];
                 arcadeState.targets = choices.map((c, i) => {
                     const sp = spots[i % spots.length];
-                    return { gx: sp.gx, gy: sp.gy, x: sp.gx * 28 + 14, y: sp.gy * 28 + 14, w: 96, h: 32, text: c.text, isCorrect: c.isCorrect, hidden: false };
+                    return { gx: sp.gx, gy: sp.gy, x: sp.gx * 40 + 20, y: sp.gy * 40 + 20, w: 145, h: 36, text: c.text, isCorrect: c.isCorrect, hidden: false };
                 });
             } else if (arena === 'star-wars') {
                 const count = choices.length;
                 const spacing = W / (count + 1);
                 arcadeState.targets = choices.map((c, i) => ({
-                    x: spacing * (i + 1), y: 68 + (i % 2) * 32, w: 138, h: 46,
-                    vx: (i % 2 === 0 ? 1 : -1) * 0.7, vy: 0.08,
+                    x: spacing * (i + 1), y: 115 + (i % 2) * 55, w: 185, h: 52,
+                    vx: (i % 2 === 0 ? 1 : -1) * 0.9, vy: 0.06,
                     text: c.text, isCorrect: c.isCorrect, hidden: false
                 }));
             } else if (arena === 'soccer') {
                 const spots = choices.length === 2
-                    ? [{ x: 255, y: 95 }, { x: 505, y: 95 }]
-                    : [{ x: 245, y: 65 }, { x: 515, y: 65 }, { x: 245, y: 145 }, { x: 515, y: 145 }];
-                arcadeState.ball = { x: 380, y: 312, vx: 0, vy: 0, scale: 1, active: false, scored: false, targetX: 380, targetY: 100 };
+                    ? [{ x: 310, y: 155 }, { x: 690, y: 155 }]
+                    : [{ x: 295, y: 110 }, { x: 705, y: 110 }, { x: 295, y: 235 }, { x: 705, y: 235 }];
+                arcadeState.ball = { x: 500, y: 455, vx: 0, vy: 0, scale: 1, active: false, scored: false, targetX: 500, targetY: 160, trail: [] };
+                arcadeState.keeperX = 500;
+                arcadeState.keeperDive = 0;
                 arcadeState.targets = choices.map((c, i) => ({
-                    x: spots[i].x, y: spots[i].y, w: 148, h: 46,
-                    text: c.text, isCorrect: c.isCorrect, hidden: false
-                }));
-            } else if (arena === 'car-race') {
-                arcadeState.carX = 95;
-                arcadeState.carLane = 0;
-                const laneH = H / choices.length;
-                arcadeState.targets = choices.map((c, i) => ({
-                    x: W - 140, y: laneH * i + laneH / 2, w: 175, h: 48, lane: i,
+                    x: spots[i].x, y: spots[i].y, w: 195, h: 54,
                     text: c.text, isCorrect: c.isCorrect, hidden: false
                 }));
             } else {
-                // Interactive click/tap targets for basketball, balloon-pop, treasure-ship, dino-run, bomb-defuse, tower-build
-                const cols = choices.length === 2 ? 2 : 2;
                 const count = choices.length;
                 const positions = count === 2
-                    ? [{ x: 220, y: 150 }, { x: 540, y: 150 }]
-                    : [{ x: 205, y: 105 }, { x: 555, y: 105 }, { x: 205, y: 225 }, { x: 555, y: 225 }];
+                    ? [{ x: 290, y: 210 }, { x: 710, y: 210 }]
+                    : [{ x: 265, y: 150 }, { x: 735, y: 150 }, { x: 265, y: 310 }, { x: 735, y: 310 }];
                 const wireColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b"];
-                arcadeState.ball = { x: 110, y: 290, vx: 0, vy: 0, scale: 1, active: false, scored: false, targetX: 380, targetY: 120 };
+                arcadeState.ball = { x: 140, y: 445, vx: 0, vy: 0, scale: 1, active: false, scored: false, targetX: 500, targetY: 160, trail: [] };
                 arcadeState.targets = choices.map((c, i) => ({
-                    x: positions[i].x, y: positions[i].y, w: 185, h: 56,
+                    x: positions[i].x, y: positions[i].y, w: 230, h: 62,
                     color: wireColors[i % 4],
                     text: c.text, isCorrect: c.isCorrect, hidden: false
                 }));
@@ -1675,24 +1746,34 @@
 
             if (arena === 'soccer') {
                 arcadeState.ball = {
-                    x: 380, y: 312,
-                    vx: (target.x - 380) / 18,
-                    vy: (target.y - 312) / 18,
+                    x: 500, y: 455,
+                    vx: (target.x - 500) / 18,
+                    vy: (target.y - 455) / 18,
                     scale: 1, active: true, scored: isCorrect,
-                    targetX: target.x, targetY: target.y
+                    targetX: target.x, targetY: target.y, trail: []
                 };
+                arcadeState.keeperDive = isCorrect ? (target.x > 500 ? -1 : 1) : (target.x > 500 ? 1 : -1);
                 if (!isCorrect) arcadeState.keeperX = target.x;
             } else if (arena === 'basketball') {
                 arcadeState.ball = {
-                    x: 110, y: 300,
-                    vx: (target.x - 110) / 22,
-                    vy: -11,
+                    x: 140, y: 445,
+                    vx: (target.x - 140) / 24,
+                    vy: -14.5,
                     scale: 1, active: true, scored: isCorrect,
-                    targetX: target.x, targetY: target.y
+                    targetX: target.x, targetY: target.y - 40, trail: []
                 };
+            } else if (arena === 'balloon-pop') {
+                arcadeState.arrow = { x: 500, y: 465, tx: target.x, ty: target.y - 45, progress: 0 };
+            } else if (arena === 'treasure-ship') {
+                arcadeState.shipPos.tx = target.x;
+                arcadeState.shipPos.ty = target.y + 45;
+            } else if (arena === 'cyber-dash') {
+                arcadeState.hoverPodTargetX = target.x;
+            } else if (arena === 'bomb-defuse') {
+                arcadeState.cutWireTarget = target;
             }
 
-            spawnParticles(target.x, target.y, isCorrect ? "#34d399" : "#f43f5e", 26);
+            spawnParticles(target.x, target.y, isCorrect ? "#34d399" : "#f43f5e", 34);
             finalizeAnswer(isCorrect, target.text, correctTarget ? correctTarget.text : "", q);
         }
 
@@ -1729,12 +1810,12 @@
 
             canvas.onpointermove = (e) => {
                 const rect = canvas.getBoundingClientRect();
-                arcadeState.pointerX = ((e.clientX - rect.left) / rect.width) * 760;
-                arcadeState.pointerY = ((e.clientY - rect.top) / rect.height) * 360;
-                if (arcadeState.arena === 'star-wars') arcadeState.shipX = Math.max(45, Math.min(715, arcadeState.pointerX));
+                arcadeState.pointerX = ((e.clientX - rect.left) / rect.width) * 1000;
+                arcadeState.pointerY = ((e.clientY - rect.top) / rect.height) * 520;
+                if (arcadeState.arena === 'star-wars') arcadeState.shipX = Math.max(55, Math.min(945, arcadeState.pointerX));
                 arcadeState.hoveredTarget = null;
                 for (const tg of arcadeState.targets) {
-                    if (!tg.hidden && Math.abs(arcadeState.pointerX - tg.x) <= tg.w / 2 + 8 && Math.abs(arcadeState.pointerY - tg.y) <= tg.h / 2 + 8) {
+                    if (!tg.hidden && Math.abs(arcadeState.pointerX - tg.x) <= tg.w / 2 + 12 && Math.abs(arcadeState.pointerY - tg.y) <= tg.h / 2 + 12) {
                         arcadeState.hoveredTarget = tg;
                         break;
                     }
@@ -1744,20 +1825,19 @@
             canvas.onpointerdown = (e) => {
                 if (appState.answered) return;
                 const rect = canvas.getBoundingClientRect();
-                const px = ((e.clientX - rect.left) / rect.width) * canvas.width;
-                const py = ((e.clientY - rect.top) / rect.height) * canvas.height;
+                const px = ((e.clientX - rect.left) / rect.width) * 1000;
+                const py = ((e.clientY - rect.top) / rect.height) * 520;
 
                 if (arcadeState.arena === 'star-wars') {
-                    arcadeState.shipX = Math.max(45, Math.min(715, px));
-                    arcadeState.bullets.push({ x: arcadeState.shipX, y: 300, vy: -11 });
+                    arcadeState.shipX = Math.max(55, Math.min(945, px));
+                    arcadeState.bullets.push({ x: arcadeState.shipX - 10, y: 440, vy: -14 });
+                    arcadeState.bullets.push({ x: arcadeState.shipX + 10, y: 440, vy: -14 });
                     return;
                 }
 
-                // Direct tap/click on any target
                 for (const tg of arcadeState.targets) {
                     if (tg.hidden) continue;
-                    if (Math.abs(px - tg.x) <= tg.w / 2 + 10 && Math.abs(py - tg.y) <= tg.h / 2 + 10) {
-                        if (arcadeState.arena === 'car-race') arcadeState.carLane = tg.lane;
+                    if (Math.abs(px - tg.x) <= tg.w / 2 + 14 && Math.abs(py - tg.y) <= tg.h / 2 + 14) {
                         handleTargetHit(tg);
                         return;
                     }
@@ -1770,7 +1850,7 @@
                 else arcadeState.action = "idle";
 
                 updateArcadePhysics();
-                drawArcadeFrame(ctx, canvas.width, canvas.height);
+                drawArcadeFrame(ctx, 1000, 520);
                 arcadeRAF = requestAnimationFrame(loop);
             }
             arcadeRAF = requestAnimationFrame(loop);
@@ -1778,32 +1858,30 @@
 
         function updateArcadePhysics() {
             const arena = arcadeState.arena;
-            if (appState.answered) return;
-
-            if (arena === 'snake') {
+            if (arena === 'snake' && !appState.answered) {
                 arcadeState.snakeTick++;
-                if (arcadeState.snakeTick % 8 === 0) {
+                if (arcadeState.snakeTick % 7 === 0) {
                     const head = arcadeState.snake[0];
                     let nx = head.x + arcadeState.snakeDir.x;
                     let ny = head.y + arcadeState.snakeDir.y;
-                    if (nx < 0) nx = 26; if (nx > 26) nx = 0;
+                    if (nx < 0) nx = 24; if (nx > 24) nx = 0;
                     if (ny < 0) ny = 12; if (ny > 12) ny = 0;
                     arcadeState.snake.unshift({ x: nx, y: ny });
                     arcadeState.snake.pop();
 
-                    const hx = nx * 28 + 14, hy = ny * 28 + 14;
+                    const hx = nx * 40 + 20, hy = ny * 40 + 20;
                     for (const tg of arcadeState.targets) {
-                        if (!tg.hidden && Math.abs(hx - tg.x) < 26 && Math.abs(hy - tg.y) < 26) {
+                        if (!tg.hidden && Math.abs(hx - tg.x) < 34 && Math.abs(hy - tg.y) < 34) {
                             handleTargetHit(tg);
                             break;
                         }
                     }
                 }
-            } else if (arena === 'star-wars') {
+            } else if (arena === 'star-wars' && !appState.answered) {
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
                     tg.x += tg.vx;
-                    if (tg.x < 80 || tg.x > 680) tg.vx *= -1;
+                    if (tg.x < 105 || tg.x > 895) tg.vx *= -1;
                 });
                 arcadeState.bullets.forEach(b => {
                     b.y += b.vy;
@@ -1815,12 +1893,17 @@
                     });
                 });
                 arcadeState.bullets = arcadeState.bullets.filter(b => b.y > -20);
-            } else if (arena === 'car-race') {
-                arcadeState.carX += 1.6;
-                if (arcadeState.carX >= 560) {
-                    const tg = arcadeState.targets[arcadeState.carLane];
-                    if (tg) handleTargetHit(tg);
-                }
+            }
+            // Smooth ship & hoverpod easing
+            if (arcadeState.shipPos) {
+                arcadeState.shipPos.x += (arcadeState.shipPos.tx - arcadeState.shipPos.x) * 0.08;
+                arcadeState.shipPos.y += (arcadeState.shipPos.ty - arcadeState.shipPos.y) * 0.08;
+            }
+            if (typeof arcadeState.hoverPodX === 'number') {
+                arcadeState.hoverPodX += (arcadeState.hoverPodTargetX - arcadeState.hoverPodX) * 0.12;
+            }
+            if (arcadeState.arrow && arcadeState.arrow.progress < 1) {
+                arcadeState.arrow.progress = Math.min(1, arcadeState.arrow.progress + 0.08);
             }
         }
 
@@ -1933,175 +2016,235 @@
                 bg.addColorStop(0, "#022c22"); bg.addColorStop(1, "#064e3b");
                 ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
                 ctx.strokeStyle = "rgba(52, 211, 153, 0.12)"; ctx.lineWidth = 1;
-                for (let x = 0; x < W; x += 28) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-                for (let y = 0; y < H; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+                for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+                for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-                // Neon Snake
+                // Neon Snake with eyes
                 arcadeState.snake.forEach((seg, idx) => {
                     ctx.save();
                     ctx.shadowColor = "#4ade80";
-                    ctx.shadowBlur = idx === 0 ? 14 : 4;
+                    ctx.shadowBlur = idx === 0 ? 18 : 6;
                     ctx.fillStyle = idx === 0 ? "#4ade80" : "#10b981";
-                    ctx.beginPath(); ctx.roundRect(seg.x * 28 + 3, seg.y * 28 + 3, 22, 22, 7); ctx.fill();
+                    ctx.beginPath(); ctx.roundRect(seg.x * 40 + 4, seg.y * 40 + 4, 32, 32, 10); ctx.fill();
+                    if (idx === 0) {
+                        ctx.fillStyle = "#022c22";
+                        ctx.beginPath();
+                        ctx.arc(seg.x * 40 + 14, seg.y * 40 + 14, 3, 0, Math.PI * 2);
+                        ctx.arc(seg.x * 40 + 26, seg.y * 40 + 14, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                     ctx.restore();
                 });
 
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
                     ctx.save();
-                    ctx.shadowColor = "#f43f5e"; ctx.shadowBlur = 12;
+                    ctx.shadowColor = "#f43f5e"; ctx.shadowBlur = 16;
                     ctx.fillStyle = "#f43f5e";
-                    ctx.beginPath(); ctx.arc(tg.x, tg.y, 10 + Math.sin(t * 0.12) * 1.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(tg.x, tg.y, 13 + Math.sin(t * 0.12) * 2, 0, Math.PI * 2); ctx.fill();
                     ctx.restore();
-                    drawChoicePill(ctx, { ...tg, y: tg.y + 26, h: 28 }, "rgba(15,23,42,0.92)", "#fbbf24");
+                    drawChoicePill(ctx, { ...tg, y: tg.y + 34, h: 34 }, "rgba(15,23,42,0.94)", "#fbbf24");
                 });
             } else if (arena === 'star-wars') {
-                const bg = ctx.createLinearGradient(0, 0, 0, H);
-                bg.addColorStop(0, "#020617"); bg.addColorStop(1, "#0f172a");
+                const bg = ctx.createRadialGradient(W * 0.5, H * 0.3, 40, W * 0.5, H * 0.5, 650);
+                bg.addColorStop(0, "#1e1b4b"); bg.addColorStop(0.5, "#0f172a"); bg.addColorStop(1, "#020617");
                 ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = "rgba(226, 232, 240, 0.65)";
-                for (let i = 0; i < 55; i++) ctx.fillRect((i * 97) % W, ((i * 53) + t * 1.8) % H, (i % 2) + 1, (i % 2) + 1);
+                ctx.fillStyle = "rgba(226, 232, 240, 0.7)";
+                for (let i = 0; i < 85; i++) ctx.fillRect((i * 113) % W, ((i * 67) + t * (1 + (i % 3))) % H, (i % 2) + 1, (i % 2) + 1);
 
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    drawVectorAlien(ctx, tg.x, tg.y - 34);
+                    drawVectorAlien(ctx, tg.x, tg.y - 40);
                     drawChoicePill(ctx, tg, "#1e1b4b", "#22d3ee");
                 });
 
                 ctx.save();
-                ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 10;
+                ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 14;
                 ctx.fillStyle = "#67e8f9";
-                arcadeState.bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 16));
+                arcadeState.bullets.forEach(b => ctx.fillRect(b.x - 2.5, b.y, 5, 22));
                 ctx.restore();
 
-                drawVectorShip(ctx, arcadeState.shipX, 318, "#22d3ee");
+                drawVectorShip(ctx, arcadeState.shipX, 462, "#22d3ee");
             } else if (arena === 'soccer') {
-                const turf = ctx.createLinearGradient(0, 0, 0, H);
-                turf.addColorStop(0, "#064e3b"); turf.addColorStop(1, "#15803d");
-                ctx.fillStyle = turf; ctx.fillRect(0, 0, W, H);
+                // Night stadium with floodlights & perspective pitch
+                const sky = ctx.createLinearGradient(0, 0, 0, 120);
+                sky.addColorStop(0, "#020617"); sky.addColorStop(1, "#0f172a");
+                ctx.fillStyle = sky; ctx.fillRect(0, 0, W, 110);
+                // Floodlight beams
+                [160, 840].forEach(lx => {
+                    const beam = ctx.createRadialGradient(lx, 20, 5, lx, 20, 260);
+                    beam.addColorStop(0, "rgba(254,240,138,0.45)"); beam.addColorStop(1, "rgba(254,240,138,0)");
+                    ctx.fillStyle = beam; ctx.fillRect(lx - 260, 0, 520, 280);
+                });
+
+                const turf = ctx.createLinearGradient(0, 80, 0, H);
+                turf.addColorStop(0, "#065f46"); turf.addColorStop(1, "#15803d");
+                ctx.fillStyle = turf; ctx.fillRect(0, 80, W, H - 80);
                 ctx.fillStyle = "rgba(255,255,255,0.04)";
-                for (let x = 0; x < W; x += 76) ctx.fillRect(x, 0, 38, H);
+                for (let x = 0; x < W; x += 100) ctx.fillRect(x, 80, 50, H - 80);
 
-                // Stadium Goalposts + Net
-                ctx.fillStyle = "rgba(15,23,42,0.35)";
-                ctx.fillRect(120, 22, 520, 175);
+                // Stadium Goal + Net
+                ctx.fillStyle = "rgba(15,23,42,0.4)";
+                ctx.fillRect(160, 48, 680, 240);
                 ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 1;
-                for (let gx = 140; gx < 640; gx += 22) { ctx.beginPath(); ctx.moveTo(gx, 22); ctx.lineTo(gx, 197); ctx.stroke(); }
-                for (let gy = 42; gy < 197; gy += 22) { ctx.beginPath(); ctx.moveTo(120, gy); ctx.lineTo(640, gy); ctx.stroke(); }
-                ctx.strokeStyle = "#f8fafc"; ctx.lineWidth = 6;
-                ctx.strokeRect(120, 22, 520, 175);
+                for (let gx = 185; gx < 840; gx += 26) { ctx.beginPath(); ctx.moveTo(gx, 48); ctx.lineTo(gx, 288); ctx.stroke(); }
+                for (let gy = 72; gy < 288; gy += 26) { ctx.beginPath(); ctx.moveTo(160, gy); ctx.lineTo(840, gy); ctx.stroke(); }
+                ctx.strokeStyle = "#f8fafc"; ctx.lineWidth = 8;
+                ctx.strokeRect(160, 48, 680, 240);
 
-                arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "rgba(15,23,42,0.88)", "#fde047"));
+                // Penalty Spot
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath(); ctx.arc(500, 455, 6, 0, Math.PI * 2); ctx.fill();
+
+                arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "rgba(15,23,42,0.9)", "#fde047"));
 
                 if (!arcadeState.ball.active && !appState.answered) {
-                    arcadeState.keeperX += arcadeState.keeperDir * 3.2;
-                    if (arcadeState.keeperX > 570 || arcadeState.keeperX < 190) arcadeState.keeperDir *= -1;
+                    arcadeState.keeperX += arcadeState.keeperDir * 4.2;
+                    if (arcadeState.keeperX > 760 || arcadeState.keeperX < 240) arcadeState.keeperDir *= -1;
                 }
-                drawVectorKeeper(ctx, arcadeState.keeperX, 122);
+                drawVectorKeeper(ctx, arcadeState.keeperX, 200);
 
                 const b = arcadeState.ball;
                 if (b.active) {
+                    b.trail = b.trail || [];
+                    b.trail.push({ x: b.x, y: b.y });
+                    if (b.trail.length > 10) b.trail.shift();
                     b.x += b.vx; b.y += b.vy;
-                    b.scale = Math.max(0.65, b.scale - 0.015);
-                    if (Math.hypot(b.x - b.targetX, b.y - b.targetY) < 16) b.active = false;
+                    b.scale = Math.max(0.6, b.scale - 0.015);
+                    if (Math.hypot(b.x - b.targetX, b.y - b.targetY) < 20) b.active = false;
                 }
-                drawVectorBall(ctx, b.x, b.y, 17 * b.scale, false);
+                (b.trail || []).forEach((pt, idx) => {
+                    ctx.fillStyle = `rgba(253,224,71,${idx * 0.06})`;
+                    ctx.beginPath(); ctx.arc(pt.x, pt.y, 8, 0, Math.PI * 2); ctx.fill();
+                });
+                drawVectorBall(ctx, b.x, b.y, 22 * b.scale, false);
             } else if (arena === 'basketball') {
                 const court = ctx.createLinearGradient(0, 0, 0, H);
-                court.addColorStop(0, "#1e1b4b"); court.addColorStop(0.55, "#451a03"); court.addColorStop(1, "#78350f");
+                court.addColorStop(0, "#0f172a"); court.addColorStop(0.55, "#451a03"); court.addColorStop(1, "#78350f");
                 ctx.fillStyle = court; ctx.fillRect(0, 0, W, H);
-                ctx.strokeStyle = "rgba(251,191,36,0.45)"; ctx.lineWidth = 2; ctx.strokeRect(20, 18, W - 40, H - 36);
+                ctx.strokeStyle = "rgba(251,191,36,0.4)"; ctx.lineWidth = 3;
+                ctx.strokeRect(24, 24, W - 48, H - 48);
+                ctx.beginPath(); ctx.arc(500, H, 220, Math.PI, 0); ctx.stroke();
 
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    // Glass Backboard & Rim
-                    ctx.fillStyle = "rgba(255,255,255,0.15)";
-                    ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 2;
-                    ctx.fillRect(tg.x - 28, tg.y - 54, 56, 30);
-                    ctx.strokeRect(tg.x - 28, tg.y - 54, 56, 30);
-                    ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 4;
-                    ctx.beginPath(); ctx.moveTo(tg.x - 16, tg.y - 26); ctx.lineTo(tg.x + 16, tg.y - 26); ctx.stroke();
+                    ctx.fillStyle = "rgba(255,255,255,0.14)";
+                    ctx.strokeStyle = "#f8fafc"; ctx.lineWidth = 2.5;
+                    ctx.fillRect(tg.x - 42, tg.y - 78, 84, 44);
+                    ctx.strokeRect(tg.x - 42, tg.y - 78, 84, 44);
+                    ctx.strokeStyle = "#f97316"; ctx.lineWidth = 5;
+                    ctx.beginPath(); ctx.moveTo(tg.x - 22, tg.y - 38); ctx.lineTo(tg.x + 22, tg.y - 38); ctx.stroke();
                     drawChoicePill(ctx, tg, "#451a03", "#fbbf24");
                 });
                 const b = arcadeState.ball;
                 if (b.active) {
                     b.x += b.vx; b.y += b.vy; b.vy += 0.65;
-                    if (Math.abs(b.x - b.targetX) < 18 && b.vy > 0) b.active = false;
+                    if (Math.abs(b.x - b.targetX) < 22 && b.vy > 0) b.active = false;
                 }
-                drawVectorBall(ctx, b.x, b.y, 17, true);
+                drawVectorBall(ctx, b.x, b.y, 22, true);
             } else if (arena === 'balloon-pop') {
                 const sky = ctx.createLinearGradient(0, 0, 0, H);
-                sky.addColorStop(0, "#0f172a"); sky.addColorStop(1, "#1e1b4b");
+                sky.addColorStop(0, "#0f172a"); sky.addColorStop(0.6, "#1e1b4b"); sky.addColorStop(1, "#312e81");
                 ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
                 const bCols = ["#f43f5e", "#8b5cf6", "#06b6d4", "#10b981"];
                 arcadeState.targets.forEach((tg, i) => {
                     if (tg.hidden) return;
-                    const fy = tg.y + Math.sin(t * 0.06 + i) * 7;
+                    const fy = tg.y + Math.sin(t * 0.05 + i) * 9;
+                    ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.moveTo(tg.x, fy - 24); ctx.lineTo(tg.x, fy - 4); ctx.stroke();
                     ctx.fillStyle = bCols[i % 4];
-                    ctx.beginPath(); ctx.ellipse(tg.x, fy - 42, 16, 20, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(tg.x, fy - 52, 22, 28, 0, 0, Math.PI * 2); ctx.fill();
                     drawChoicePill(ctx, { ...tg, y: fy }, "#1e1b4b", bCols[i % 4]);
                 });
-                // Crosshair
+                if (arcadeState.arrow) {
+                    const a = arcadeState.arrow;
+                    const ax = a.x + (a.tx - a.x) * a.progress;
+                    const ay = a.y + (a.ty - a.y) * a.progress;
+                    ctx.strokeStyle = "#fde047"; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax - (a.tx - a.x) * 0.08, ay - (a.ty - a.y) * 0.08); ctx.stroke();
+                }
                 ctx.strokeStyle = "#f472b6"; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(arcadeState.pointerX, arcadeState.pointerY, 14, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(arcadeState.pointerX, arcadeState.pointerY, 18, 0, Math.PI * 2); ctx.stroke();
             } else if (arena === 'treasure-ship') {
                 const sea = ctx.createLinearGradient(0, 0, 0, H);
-                sea.addColorStop(0, "#0c4a6e"); sea.addColorStop(1, "#0369a1");
+                sea.addColorStop(0, "#082f49"); sea.addColorStop(1, "#0369a1");
                 ctx.fillStyle = sea; ctx.fillRect(0, 0, W, H);
-                ctx.strokeStyle = "rgba(186,230,253,0.25)"; ctx.lineWidth = 2;
-                for (let wy = 70; wy < H; wy += 45) {
+                ctx.strokeStyle = "rgba(186,230,253,0.22)"; ctx.lineWidth = 2;
+                for (let wy = 65; wy < H; wy += 52) {
                     ctx.beginPath();
-                    for (let wx = 0; wx <= W; wx += 30) ctx.lineTo(wx, wy + Math.sin((wx + t * 3) * 0.04) * 4);
+                    for (let wx = 0; wx <= W; wx += 35) ctx.lineTo(wx, wy + Math.sin((wx + t * 3) * 0.035) * 5);
                     ctx.stroke();
                 }
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
                     ctx.fillStyle = "#fde047";
-                    ctx.beginPath(); ctx.arc(tg.x, tg.y - 34, 14, Math.PI, 0); ctx.fill();
+                    ctx.beginPath(); ctx.arc(tg.x, tg.y - 40, 18, Math.PI, 0); ctx.fill();
                     drawChoicePill(ctx, tg, "#082f49", "#38bdf8");
                 });
-                // Vector Ship
-                ctx.fillStyle = "#78350f";
-                ctx.beginPath(); ctx.moveTo(345, 315); ctx.lineTo(415, 315); ctx.lineTo(400, 336); ctx.lineTo(360, 336); ctx.closePath(); ctx.fill();
+                const sp = arcadeState.shipPos || { x: 500, y: 440 };
+                ctx.save(); ctx.translate(sp.x, sp.y);
+                ctx.fillStyle = "#92400e";
+                ctx.beginPath(); ctx.moveTo(-42, 0); ctx.lineTo(42, 0); ctx.lineTo(26, 22); ctx.lineTo(-26, 22); ctx.closePath(); ctx.fill();
                 ctx.fillStyle = "#f8fafc";
-                ctx.beginPath(); ctx.moveTo(380, 275); ctx.lineTo(405, 312); ctx.lineTo(380, 312); ctx.closePath(); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(0, -48); ctx.lineTo(32, -4); ctx.lineTo(0, -4); ctx.closePath(); ctx.fill();
+                ctx.restore();
             } else if (arena === 'cyber-dash') {
                 const bg = ctx.createLinearGradient(0, 0, 0, H);
-                bg.addColorStop(0, "#022c22"); bg.addColorStop(1, "#0f172a");
+                bg.addColorStop(0, "#020617"); bg.addColorStop(0.55, "#064e3b"); bg.addColorStop(1, "#022c22");
                 ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-                ctx.strokeStyle = "rgba(16,185,129,0.25)"; ctx.lineWidth = 2;
-                for (let gx = (t * 4) % 40; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 280); ctx.lineTo(gx, H); ctx.stroke(); }
+                // Synthwave perspective grid
+                ctx.strokeStyle = "rgba(52,211,153,0.24)"; ctx.lineWidth = 1.5;
+                for (let i = -6; i <= 6; i++) {
+                    ctx.beginPath(); ctx.moveTo(500 + i * 30, 260); ctx.lineTo(500 + i * 160, H); ctx.stroke();
+                }
+                for (let gy = 270 + (t * 3) % 35; gy < H; gy += 35) {
+                    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+                }
                 arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#064e3b", "#34d399"));
-                // Cyber Runner Pod
+                const hx = arcadeState.hoverPodX || 500;
+                ctx.save(); ctx.shadowColor = "#34d399"; ctx.shadowBlur = 18;
                 ctx.fillStyle = "#34d399";
-                ctx.beginPath(); ctx.roundRect(355, 295, 50, 22, 11); ctx.fill();
+                ctx.beginPath(); ctx.roundRect(hx - 35, 445, 70, 26, 13); ctx.fill();
+                ctx.restore();
             } else if (arena === 'bomb-defuse') {
                 ctx.fillStyle = "#09090b"; ctx.fillRect(0, 0, W, H);
-                // Circuit board grid
                 ctx.strokeStyle = "rgba(239,68,68,0.12)"; ctx.lineWidth = 1;
-                for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-                // Central Core
-                ctx.fillStyle = "#27272a"; ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.roundRect(320, 18, 120, 44, 10); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = "#ef4444"; ctx.font = "800 13px Cairo"; ctx.textAlign = "center";
-                ctx.fillText("ACTIVE CORE", 380, 41);
+                for (let x = 0; x < W; x += 36) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+                // Oscilloscope Monitor
+                ctx.fillStyle = "#18181b"; ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(350, 18, 300, 68, 12); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = arcadeState.action === 'correct' ? "#10b981" : "#ef4444"; ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let ox = 365; ox <= 635; ox += 5) {
+                    const oy = 52 + Math.sin((ox + t * 6) * 0.08) * 16;
+                    if (ox === 365) ctx.moveTo(ox, oy); else ctx.lineTo(ox, oy);
+                }
+                ctx.stroke();
 
                 arcadeState.targets.forEach(tg => {
                     if (tg.hidden) return;
-                    ctx.strokeStyle = tg.color; ctx.lineWidth = 5;
-                    ctx.beginPath(); ctx.moveTo(380, 62); ctx.bezierCurveTo(380, 110, tg.x, 90, tg.x, tg.y); ctx.stroke();
+                    const isCut = arcadeState.cutWireTarget === tg;
+                    ctx.strokeStyle = tg.color; ctx.lineWidth = 6;
+                    if (isCut) ctx.setLineDash([12, 18]);
+                    ctx.beginPath(); ctx.moveTo(500, 86); ctx.bezierCurveTo(500, 160, tg.x, 120, tg.x, tg.y); ctx.stroke();
+                    ctx.setLineDash([]);
                     drawChoicePill(ctx, tg, "#18181b", tg.color);
                 });
             } else {
                 // tower-build
                 const bg = ctx.createLinearGradient(0, 0, 0, H);
-                bg.addColorStop(0, "#0f172a"); bg.addColorStop(1, "#1e1b4b");
+                bg.addColorStop(0, "#020617"); bg.addColorStop(1, "#1e1b4b");
                 ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
                 arcadeState.targets.forEach(tg => drawChoicePill(ctx, tg, "#312e81", "#fbbf24"));
                 for (let i = 0; i < appState.correctCount; i++) {
                     ctx.fillStyle = i % 2 === 0 ? "#f59e0b" : "#10b981";
-                    ctx.fillRect(320, H - 18 - i * 14, 120, 12);
+                    ctx.fillRect(420, H - 22 - i * 18, 160, 15);
                 }
+                const craneX = 500 + Math.sin(t * 0.04) * 180;
+                ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(craneX, 0); ctx.lineTo(craneX, 55); ctx.stroke();
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillRect(craneX - 40, 55, 80, 18);
             }
 
             arcadeState.particles.forEach(p => {
@@ -2143,8 +2286,25 @@
         });
         document.getElementById('btn-arcade-fire').addEventListener('click', () => {
             if (!appState.answered && arcadeState.arena === 'star-wars') {
-                arcadeState.bullets.push({ x: arcadeState.shipX, y: 300, vy: -11 });
+                arcadeState.bullets.push({ x: arcadeState.shipX - 10, y: 440, vy: -14 });
+                arcadeState.bullets.push({ x: arcadeState.shipX + 10, y: 440, vy: -14 });
             }
+        });
+        document.getElementById('btn-theater-back').addEventListener('click', () => {
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            showView(viewLanding);
+        });
+        document.getElementById('btn-theater-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        });
+        document.getElementById('btn-theater-sound').addEventListener('click', (e) => {
+            soundEnabled = !soundEnabled;
+            e.currentTarget.textContent = soundEnabled ? "🔊" : "🔇";
+            document.getElementById('btn-sound-toggle').textContent = soundEnabled ? "🔊" : "🔇";
         });
         window.addEventListener('keydown', (e) => {
             if (viewQuiz.classList.contains('hidden') || appState.answered) return;
