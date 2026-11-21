@@ -3779,7 +3779,37 @@ ${contextSummary || "لا يوجد نص بعد."}
             };
 
             if (INQUIRY_AI_KEY) {
-                if (INQUIRY_AI_KEY.startsWith("sk-or-")) {
+                if (INQUIRY_AI_KEY.startsWith("gsk_")) {
+                    const groqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
+                    for (const model of groqModels) {
+                        try {
+                            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${INQUIRY_AI_KEY}`
+                                },
+                                body: JSON.stringify({
+                                    model,
+                                    messages: [
+                                        { role: "system", content: systemPrompt },
+                                        { role: "user", content: userPrompt }
+                                    ],
+                                    temperature: 0.7,
+                                    max_tokens: 350
+                                })
+                            });
+                            if (res.ok) {
+                                const data = await res.json();
+                                const reply = data?.choices?.[0]?.message?.content;
+                                if (reply) {
+                                    inqAiStatus.textContent = "متصل بالذكاء الاصطناعي (Groq ⚡)";
+                                    return reply.trim();
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                } else if (INQUIRY_AI_KEY.startsWith("sk-or-")) {
                     const orModels = ["openrouter/free", "google/gemini-2.0-flash-001", "openai/gpt-4o-mini"];
                     for (const model of orModels) {
                         try {
