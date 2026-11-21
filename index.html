@@ -9,12 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <style>
-        body {
+        html, body {
             font-family: 'Cairo', sans-serif;
             background: radial-gradient(circle at top right, #0f766e 0%, #0f172a 55%, #1e1b4b 100%);
-            min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button, input, select, textarea {
+            touch-action: manipulation;
         }
         .sci-expr {
             direction: ltr;
@@ -265,14 +269,14 @@
                     <span id="arena-title-label" class="text-amber-300">🎮 ساحة اللعبة</span>
                     <span id="arena-status-label" class="text-emerald-300">استعد للانطلاق!</span>
                 </div>
-                <canvas id="arcade-canvas" width="760" height="210" class="w-full h-44 sm:h-52 block cursor-crosshair touch-none"></canvas>
+                <canvas id="arcade-canvas" width="760" height="210" class="w-full h-32 sm:h-48 md:h-52 block cursor-crosshair touch-none"></canvas>
             </div>
 
             <!-- Question Area -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-center mb-5 sm:mb-6">
                 <div class="lg:col-span-8">
-                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 shadow-inner">
-                        <p id="quiz-question-text" class="text-lg sm:text-2xl font-black text-slate-900 leading-relaxed"></p>
+                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-3.5 sm:p-5 shadow-inner">
+                        <p id="quiz-question-text" class="text-base sm:text-2xl font-black text-slate-900 leading-relaxed"></p>
                     </div>
                 </div>
                 <div class="lg:col-span-4 flex justify-center">
@@ -1846,7 +1850,7 @@
             (q.options || []).forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = "option-btn w-full text-right p-4 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-300 hover:border-emerald-500 font-extrabold text-base sm:text-lg text-slate-800 shadow-sm flex items-center gap-3";
+                btn.className = "option-btn w-full text-right p-3 sm:p-4 min-h-[50px] rounded-2xl bg-white hover:bg-emerald-50 border-2 border-slate-300 hover:border-emerald-500 font-extrabold text-sm sm:text-lg text-slate-800 shadow-sm flex items-center gap-2.5 sm:gap-3";
                 btn.innerHTML = `
                     <span class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center font-black text-teal-800 shrink-0">${letters[idx]}</span>
                     <span class="flex-1">${opt}</span>
@@ -1940,9 +1944,9 @@
                 <p class="text-xs sm:text-sm font-extrabold text-teal-800 bg-teal-50 border border-teal-200 rounded-xl px-3 py-2 text-center">
                     اضغط على بطاقة من العمود الأيمن ثم اضغط على ما يطابقها من العمود الأيسر 🔗
                 </p>
-                <div class="grid grid-cols-2 gap-4">
-                    <div id="match-left-col" class="space-y-2.5"></div>
-                    <div id="match-right-col" class="space-y-2.5"></div>
+                <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                    <div id="match-left-col" class="space-y-2 sm:space-y-2.5"></div>
+                    <div id="match-right-col" class="space-y-2 sm:space-y-2.5"></div>
                 </div>
             `;
             area.appendChild(wrapper);
